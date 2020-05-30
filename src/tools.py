@@ -78,3 +78,25 @@ class State(object):
     def draw(self, surface):
         """Draw scene to screen"""
         pass
+
+
+class _BaseSprite(pg.sprite.Sprite):
+    """The base class for all types of sprites"""
+
+    def __init__(self, pos, size, *groups):
+        pg.sprite.Sprite.__init__(self, *groups)
+        self.rect = pg.Rect(pos, size)
+        self.exact_pos = list(self.rect.topleft)
+        self.old_pos = self.exact_pos[:]
+
+    def reset_position(self, value):
+        """
+        Set sprite location to new point. By default `value`
+        specifies a position in the topleft corner.
+        """
+        setattr(self.rect, "topleft", value)
+        self.exact_pos = list(self.rect.topleft)
+        self.old_pos = self.exact_pos[:]
+
+    def draw(self, surface):
+        surface.blit(self.image, self.rect)

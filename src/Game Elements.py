@@ -34,7 +34,7 @@ class Player(object):
                 self.x_vel = 0
             if event.key == pg.K_UP or event.type == pg.K_DOWN:
                 self.y_vel = 0
-
+    # If you want we can add this to movement
     def rotate(self, event):
         """Rotates player"""
         if event.type == pg.MOUSEMOTION:
@@ -48,3 +48,5 @@ class Player(object):
         pass
         """I DONT KNOW HOW YOU HAVE TO DO IT TO DRAW IN THIS CODE, BUT TO DRAW THE OBJECT YOU HAVE TO USE:
         screen.blit(pg.transform.rotate(self.img,slef.angle),(self.x_pos,self.y_pos))"""
+class Enemy(object):
+    def __init__(self):

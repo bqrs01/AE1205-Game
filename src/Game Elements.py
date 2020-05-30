@@ -1,6 +1,6 @@
 # Im trying this file to try to declare some objects and functions
 import pygame as pg
-from math import sqrt, atan2, pi
+from math import sqrt, atan2, pi, cos, sin
 
 
 # HERE IM JUST SETTING THE VALUES, I DONT NOW HOW TO ACTUALLY SHOW IT IN THE SCREEN AND APPLY THE CHANGES :)
@@ -13,7 +13,7 @@ class Player(object):
         self.x_vel = 0
         self.y_vel = 0
         self.angle = 0
-        self.img = pg.image.load("./images/whiteplain.png")
+        self.img = pg.image.load("./images/redplain.png")
         self.img = pg.transform.scale(self.img, (32, 32))
 
     def movement(self, event):
@@ -55,10 +55,18 @@ class Enemy(object):
     def __init__(self):
         self.x_pos = 0
         self.y_pos = 0
-        self.vel = 2 # we have to do that the velocity modulus is constant, but depending in the position wrt
-                     # the Player x and y vel variate, always summing a modulus of 2
+        self.vel = 2  # we have to do that the velocity modulus is constant, but depending in the position wrt
+        # the Player x and y vel variate, always summing a modulus of 2
         self.x_vel = 0
         self.y_vel = 0
         self.angle = 0
         self.img = pg.image.load("./images/whiteplain.png")
         self.img = pg.transform.scale(self.img, (32, 32))
+
+    def movement(self, playerx, playery):
+        self.angle = atan2((playery - self.y_pos), (playerx - self.x_pos)) - 90
+        self.x_vel = cos(self.angle * pi / 180) * self.vel
+        self.y_vel = sin(self.angle * pi / 180) * self.vel
+    def draw(self):
+        """ I dont know how to draw it xD, but the same as before:
+        screen.blit(pg.transform.rotate(self.img,slef.angle),(self.x_pos,self.y_pos))"""

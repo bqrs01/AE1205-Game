@@ -99,7 +99,7 @@ class Enemy2(object):
 
 
 class Bullet(object):
-    #There is actually two colors for the bullet, you can take which ever you want
+    # There is actually two colors for the bullet, you can take which ever you want
     # if you want we can make different bullets for different aircrafts
 
     def __init__(self):
@@ -109,7 +109,7 @@ class Bullet(object):
         self.vel = 2
         self.x_vel = 0
         self.y_vel = 0
-        self.img = pg.image.load("./images/redbullet") # // ./images/blackbullet
+        self.img = pg.image.load("./images/redbullet")  # // ./images/blackbullet
         self.img = pg.transform.scale(self.img, (16, 16))
 
     def movement(self, playerx, playery, angle):

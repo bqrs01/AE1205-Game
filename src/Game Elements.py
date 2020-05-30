@@ -12,3 +12,15 @@ class Player(object):
         self.angle = 0
         self.img = pg.image.load("./images/whiteplain.png")
 
+    def movement(self,event):
+        if event.type = pg.KEYDOWN:
+            if event.key == pg.K_RIGHT:
+                self.x_vel = 2
+            elif event.key == pg.K_LEFT:
+                self.x_vel = -2
+            elif event.key == pg.K_UP:
+                self.y_vel = 2
+            elif event.key == pg.K_DOWN:
+                self.y_vel = -2
+            elif event.key == pg.SPACE:
+                pass # Shoot bullet

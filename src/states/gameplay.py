@@ -34,6 +34,8 @@ class GamePlay(tools.State):
             #     self.x_velocity = -1
         elif event.type == pg.KEYUP:
             self.player.pop_direction(event.key)
+        elif event.type == pg.MOUSEMOTION:
+            self.player.update_angle(event.pos)
 
     def update(self, dt):
         self.player.update()
@@ -50,4 +52,6 @@ class GamePlay(tools.State):
         surface.fill(pg.Color('white'))
         #pg.draw.rect(surface, pg.Color("darkgreen"), self.rect)
         self.player.draw(surface)
+        pg.draw.lines(surface, (0, 0, 0), False, [
+            self.player.rect.center, self.player.mouse_position])
         surface.blit(self.exit_message, self.exit_message_rect)

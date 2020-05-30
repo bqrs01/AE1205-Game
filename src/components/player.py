@@ -2,7 +2,12 @@
 This module contains the class for the player.
 """
 import pygame as pg
+import os
+from math import atan2, pi, sqrt
 from .. import prepare, tools
+
+PLAYER_SIZE = (32, 32)
+CELL_SIZE = (46, 46)
 
 
 class Player(tools._BaseSprite):
@@ -13,24 +18,35 @@ class Player(tools._BaseSprite):
 
     def __init__(self, *groups):
         tools._BaseSprite.__init__(
-            self, prepare.STARTING_POS, (32, 32), *groups)
+            self, prepare.STARTING_POS, CELL_SIZE, *groups)
         self.controls = prepare.DEFAULT_CONTROLS
-        self.image = self.make_image()
+
         self.mask = self.make_mask()
         self.direction = "right"
         self.direction_stack = []
         self.speed = 8
+        self.angle = 0
+        self.mouse_position = (
+            prepare.SCREEN_SIZE[0]//2, prepare.SCREEN_SIZE[1]//2)
+        self.movement = False
 
-    def make_image(self):
-        base = pg.Surface((32, 32)).convert()
-        base.fill((0, 0, 0, 0))
+        self.playerImage = pg.image.load(
+            os.path.join(os.getcwd(), "src/images/redplain.png"))
+        self.playerImage = pg.transform.scale(self.playerImage, (32, 32))
+        self.image = self.make_image(self.playerImage)
+
+    def make_image(self, imageA):
+        base = pg.Surface(CELL_SIZE).convert()
+        base.fill((255, 255, 255, 0))
         image = base.copy()
-        pg.draw.circle(image, (255, 0, 0), (25, 25), 15)
+        rotatedImage, origin = tools.rotateImage(image, self.playerImage,
+                                                 (23, 23), (16, 16), self.angle)
+        image.blit(rotatedImage, origin)
         return image
 
     def make_mask(self):
         """Create a collision mask for the player."""
-        temp = pg.Surface((50, 50)).convert_alpha()
+        temp = pg.Surface(CELL_SIZE).convert_alpha()
         temp.fill((0, 0, 0, 0))
         temp.fill(pg.Color("white"), (10, 20, 30, 30))
         return pg.mask.from_surface(temp)
@@ -38,6 +54,7 @@ class Player(tools._BaseSprite):
     def add_direction(self, key):
         """Add a pressed direction key on the direction stack."""
         if key in self.controls:
+            self.movement = True
             direction = self.controls[key]
             if direction in self.direction_stack:
                 self.direction_stack.remove(direction)
@@ -51,8 +68,8 @@ class Player(tools._BaseSprite):
                 self.direction_stack.remove(direction)
 
     def checkOutOfBounds(self):
-        right = prepare.SCREEN_SIZE[0] - self.rect.width
-        bottom = prepare.SCREEN_SIZE[1] - self.rect.height
+        right = prepare.SCREEN_SIZE[0] - ((self.rect.width)/2)
+        bottom = prepare.SCREEN_SIZE[1] - (self.rect.height/2)
         if self.exact_pos[0] < 0:
             self.exact_pos[0] = 0
         elif self.exact_pos[0] > right:
@@ -63,10 +80,24 @@ class Player(tools._BaseSprite):
         elif self.exact_pos[1] > bottom:
             self.exact_pos[1] = bottom
 
+    def update_angle(self, position):
+        # Gets position of the mouse
+        mousex, mousey = position
+        # To calculate the angle
+        self.angle = atan2(-(mousey - self.rect.center[1]),
+                           (mousex - self.rect.center[0])) * 180 / pi - 90
+
+        self.mouse_position = position
+
+    def rot_center(self, image, angle):
+        center = image.get_rect().center
+        rotated_image = pg.transform.rotate(image, angle)
+        new_rect = rotated_image.get_rect(center=center)
+        return rotated_image, new_rect
+
     def move(self):
         """Move the player."""
         if self.direction_stack:
-            print(self.direction_stack)
             if len(self.direction_stack) == 2:
                 con_1 = (
                     'right' in self.direction_stack and 'left' in self.direction_stack)
@@ -90,5 +121,5 @@ class Player(tools._BaseSprite):
         self.old_pos = self.exact_pos[:]
         self.move()
         self.checkOutOfBounds()
-        # print(self.exact_pos)
-        self.rect.topleft = self.exact_pos
+        self.image = self.make_image(self.playerImage)
+        self.rect.center = self.exact_pos

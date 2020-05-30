@@ -13,7 +13,7 @@ class Player(tools._BaseSprite):
 
     def __init__(self, *groups):
         tools._BaseSprite.__init__(
-            self, prepare.STARTING_POS, (50, 50), *groups)
+            self, prepare.STARTING_POS, (32, 32), *groups)
         self.controls = prepare.DEFAULT_CONTROLS
         self.image = self.make_image()
         self.mask = self.make_mask()
@@ -22,7 +22,7 @@ class Player(tools._BaseSprite):
         self.speed = 8
 
     def make_image(self):
-        base = pg.Surface((50, 50)).convert()
+        base = pg.Surface((32, 32)).convert()
         base.fill((0, 0, 0, 0))
         image = base.copy()
         pg.draw.circle(image, (255, 0, 0), (25, 25), 15)

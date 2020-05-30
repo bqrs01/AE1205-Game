@@ -1,6 +1,6 @@
 # Im trying this file to try to declare some objects and functions
 import pygame as pg
-from math import sqrt
+from math import sqrt, atan
 
 
 # HERE IM JUST SETTING THE VALUES, I DONT NOW HOW TO ACTUALLY SHOW IT IN THE SCREEN AND APPLY THE CHANGES :)
@@ -36,4 +36,6 @@ class Player(object):
     def rotate(self, event):
         if event.type == pg.MOUSEMOTION:
             mousex, mousey = event.pos
-            direction_vector = (abs(self.x_pos - mousex), abs(self.y_pos - mousey))
+            direction_vector = (mousex - self.x_pos, mousey - self.y_pos)
+            angle = atan(direction_vector[1] / direction_vector[0])
+

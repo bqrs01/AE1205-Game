@@ -13,5 +13,6 @@ def main():
         "SPLASH": splash.SplashScreen(),
         "GAMEPLAY": gameplay.GamePlay()
     }
+
     game = tools.Game(screen, states, "SPLASH")
     game.run()

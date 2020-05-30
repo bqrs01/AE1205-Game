@@ -10,7 +10,7 @@ class GamePlay(tools.State):
         super(GamePlay, self).__init__()
         self.rect = pg.Rect((0, 0), (64, 64))
         self.x_velocity = 1
-        self.y_velocity = -1
+        self.y_velocity = 1
 
         self.exit_message = self.font.render(
             "Press ESC to quit.", True, pg.Color('black'))

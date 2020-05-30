@@ -27,13 +27,14 @@ class Player(object):
                 self.y_vel = 2
             elif event.key == pg.K_s:
                 self.y_vel = -2
-            elif event.key == pg.SPACE:
+            elif event.key == pg.SPACE:  # instead of this key you can set this to a mouseclick
                 pass  # Shoot bullet
         if event.type == pg.KEYUP:
             if event.key == pg.K_LEFT or event.type == pg.K_RIGHT:
                 self.x_vel = 0
             if event.key == pg.K_UP or event.type == pg.K_DOWN:
                 self.y_vel = 0
+
     # If you want we can add this to movement
     def rotate(self, event):
         """Rotates player"""
@@ -48,5 +49,16 @@ class Player(object):
         pass
         """I DONT KNOW HOW YOU HAVE TO DO IT TO DRAW IN THIS CODE, BUT TO DRAW THE OBJECT YOU HAVE TO USE:
         screen.blit(pg.transform.rotate(self.img,slef.angle),(self.x_pos,self.y_pos))"""
+
+
 class Enemy(object):
     def __init__(self):
+        self.x_pos = 0
+        self.y_pos = 0
+        self.vel = 2 # we have to do that the velocity modulus is constant, but depending in the position wrt
+                     # the Player x and y vel variate, always summing a modulus of 2
+        self.x_vel = 0
+        self.y_vel = 0
+        self.angle = 0
+        self.img = pg.image.load("./images/whiteplain.png")
+        self.img = pg.transform.scale(self.img, (32, 32))

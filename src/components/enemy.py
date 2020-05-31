@@ -3,12 +3,11 @@ This module contains the class for the player.
 """
 import pygame as pg
 import os
-from math import atan2, pi, sqrt
+from math import atan2, pi, sqrt, cos, sin
 from .. import prepare, tools
 
 ENEMY_SIZE = (32, 32)
 CELL_SIZE = (46, 46)
-
 
 
 class Enemy(tools._BaseSprite):
@@ -20,7 +19,7 @@ class Enemy(tools._BaseSprite):
     def __init__(self, *groups):
         tools._BaseSprite.__init__(
             self, prepare.STARTING_POS, CELL_SIZE, *groups)
-        #self.controls = prepare.DEFAULT_CONTROLS
+        # self.controls = prepare.DEFAULT_CONTROLS
 
         self.mask = self.make_mask()
         self.direction = "right"
@@ -50,11 +49,9 @@ class Enemy(tools._BaseSprite):
         temp.fill(pg.Color("white"), (10, 20, 30, 30))
         return pg.mask.from_surface(temp)
 
-
-
     def checkOutOfBounds(self):
-        right = prepare.SCREEN_SIZE[0] - ((self.rect.width)/2)
-        bottom = prepare.SCREEN_SIZE[1] - (self.rect.height/2)
+        right = prepare.SCREEN_SIZE[0] - ((self.rect.width) / 2)
+        bottom = prepare.SCREEN_SIZE[1] - (self.rect.height / 2)
         if self.exact_pos[0] < 0:
             self.exact_pos[0] = 0
         elif self.exact_pos[0] > right:
@@ -69,7 +66,7 @@ class Enemy(tools._BaseSprite):
         # Gets position of the mouse
         playerx, playery = position
         # To calculate the angle
-        self.angle = atan2(-(playerx-self.rect.center[1]),(playery-self.rect.center[0])) * 180 / pi
+        self.angle = atan2(-(playerx - self.rect.center[1]), (playery - self.rect.center[0])) * 180 / pi
 
     def rot_center(self, image, angle):
         center = image.get_rect().center
@@ -77,12 +74,16 @@ class Enemy(tools._BaseSprite):
         new_rect = rotated_image.get_rect(center=center)
         return rotated_image, new_rect
 
+    def move(self, playerx, playery):
+        """Move the enemy."""
+        self.angle = atan2(-(playery - self.exact_pos[1]), (playerx - self.exact_pos[0])) * 180 / pi -90
+        self.exact_pos[0] -= self.speed * cos(self.angle)
+        self.exact_pos[1] += self.speed * sin(self.angle)
 
-
-    def update(self, *args):
+    def update(self, playerx, playery, *args):
         """Updates player every frame."""
         self.old_pos = self.exact_pos[:]
-        self.move()
+        self.move(playerx, playery)
         self.checkOutOfBounds()
         self.image = self.make_image(self.enemyImage)
         self.rect.center = self.exact_pos

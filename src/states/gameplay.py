@@ -13,6 +13,7 @@ class GamePlay(tools.State):
         # self.x_velocity = 1
         # self.y_velocity = -1
         self.player = player.Player()
+        self.enemy = enemy.Enemy()
         self.exit_message = self.font.render(
             "Press ESC to quit.", True, pg.Color('black'))
         self.exit_message_rect = self.exit_message.get_rect(center=(85, 20))
@@ -39,6 +40,7 @@ class GamePlay(tools.State):
 
     def update(self, dt):
         self.player.update()
+        self.enemy.update(self.player.exact_pos[0],self.player.exact_pos[1])
         # print(self.x_velocity, self.y_velocity)
         # self.rect.move_ip(self.x_velocity, (-1) * self.y_velocity)
         # if (self.rect.right > self.screen_rect.right or self.rect.left < self.screen_rect.left):
@@ -52,6 +54,7 @@ class GamePlay(tools.State):
         surface.fill(pg.Color('white'))
         #pg.draw.rect(surface, pg.Color("darkgreen"), self.rect)
         self.player.draw(surface)
+        self.enemy.draw(surface)
         pg.draw.lines(surface, (0, 0, 0), False, [
             self.player.rect.center, self.player.mouse_position])
         surface.blit(self.exit_message, self.exit_message_rect)

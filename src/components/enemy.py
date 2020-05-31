@@ -1,5 +1,5 @@
 """
-This module contains the class for the player.
+This module contains the class for the enemy.
 """
 import pygame as pg
 import os
@@ -12,8 +12,7 @@ CELL_SIZE = (46, 46)
 
 class Enemy(tools._BaseSprite):
     """
-    The class for player objects. It will be used to keep
-    track of scores, health and more.
+    The class for enemy objects.
     """
 
     def __init__(self, *groups):
@@ -66,7 +65,8 @@ class Enemy(tools._BaseSprite):
         # Gets position of the mouse
         playerx, playery = position
         # To calculate the angle
-        self.angle = atan2(-(playerx - self.rect.center[1]), (playery - self.rect.center[0])) * 180 / pi
+        self.angle = atan2(-(playerx -
+                             self.rect.center[1]), (playery - self.rect.center[0])) * 180 / pi
 
     def rot_center(self, image, angle):
         center = image.get_rect().center
@@ -76,7 +76,8 @@ class Enemy(tools._BaseSprite):
 
     def move(self, playerx, playery):
         """Move the enemy."""
-        self.angle = atan2(-(playery - self.exact_pos[1]), (playerx - self.exact_pos[0])) * 180 / pi -90
+        self.angle = atan2(-(playery - self.exact_pos[1]),
+                           (playerx - self.exact_pos[0])) * 180 / pi - 90
         self.exact_pos[0] -= self.speed * cos(self.angle)
         self.exact_pos[1] += self.speed * sin(self.angle)
 

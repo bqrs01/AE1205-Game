@@ -2,7 +2,7 @@ import sys
 import pygame as pg
 
 from .. import tools
-from ..components import player
+from ..components import player, enemy
 
 
 class GamePlay(tools.State):

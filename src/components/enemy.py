@@ -29,7 +29,7 @@ class Enemy(tools._BaseSprite):
         self.movement = False
 
         self.enemyImage = pg.image.load(
-            os.path.join(os.getcwd(), "src/images/whiteplain.png"))
+            os.path.join(os.getcwd(), "src/images/whiteplain3.png"))
         self.enemyImage = pg.transform.scale(self.enemyImage, (32, 32))
         self.image = self.make_image(self.enemyImage)
 

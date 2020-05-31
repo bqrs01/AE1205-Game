@@ -81,10 +81,19 @@ class Enemy(tools._BaseSprite):
         self.exact_pos[0] -= self.speed * cos(self.angle)
         self.exact_pos[1] += self.speed * sin(self.angle)
 
-    def update(self, playerx, playery, *args):
+    def update(self, playerx, playery, playerIsMoving, *args):
         """Updates player every frame."""
-        self.old_pos = self.exact_pos[:]
-        self.move(playerx, playery)
-        self.checkOutOfBounds()
-        self.image = self.make_image(self.enemyImage)
-        self.rect.center = self.exact_pos
+        if playerIsMoving:
+            print("Player moving")
+            # self.old_pos = self.exact_pos[:]
+            # self.move(playerx, playery)
+            # self.checkOutOfBounds()
+            # self.image = self.make_image(self.enemyImage)
+            # self.rect.center = self.exact_pos
+        else:
+            print("Player not moving")
+            self.old_pos = self.exact_pos[:]
+            self.move(playerx, playery)
+            self.checkOutOfBounds()
+            self.image = self.make_image(self.enemyImage)
+            self.rect.center = self.exact_pos

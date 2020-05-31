@@ -114,8 +114,6 @@ def rotateImage(surf, image, pos, originPos, angle):
     max_box = (max(box_rotate, key=lambda p: p[0])[
                0], max(box_rotate, key=lambda p: p[1])[1])
 
-    print(box_rotate, min_box, max_box)
-
     # calculate the translation of the pivot
     pivot = pg.math.Vector2(originPos[0], -originPos[1])
     pivot_rotate = pivot.rotate(angle)

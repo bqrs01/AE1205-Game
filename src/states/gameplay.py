@@ -40,7 +40,8 @@ class GamePlay(tools.State):
 
     def update(self, dt):
         self.player.update()
-        self.enemy.update(self.player.exact_pos[0],self.player.exact_pos[1])
+        self.enemy.update(
+            self.player.exact_pos[0], self.player.exact_pos[1], self.player.isMoving)
         # print(self.x_velocity, self.y_velocity)
         # self.rect.move_ip(self.x_velocity, (-1) * self.y_velocity)
         # if (self.rect.right > self.screen_rect.right or self.rect.left < self.screen_rect.left):

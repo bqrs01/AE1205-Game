@@ -29,6 +29,7 @@ class Player(tools._BaseSprite):
         self.mouse_position = (
             prepare.SCREEN_SIZE[0]//2, prepare.SCREEN_SIZE[1]//2)
         self.movement = False
+        self.isMoving = False
 
         self.playerImage = pg.image.load(
             os.path.join(os.getcwd(), "src/images/redplain.png"))
@@ -118,6 +119,10 @@ class Player(tools._BaseSprite):
 
     def update(self, *args):
         """Updates player every frame."""
+        if not (self.old_pos == self.exact_pos):
+            self.isMoving = True
+        else:
+            self.isMoving = False
         self.old_pos = self.exact_pos[:]
         self.move()
         self.checkOutOfBounds()

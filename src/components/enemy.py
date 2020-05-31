@@ -3,11 +3,65 @@ This module contains the class for the enemy.
 """
 import pygame as pg
 import os
+import random
 from math import atan2, pi, sqrt, cos, sin
 from .. import prepare, tools
 
 ENEMY_SIZE = (32, 32)
 CELL_SIZE = (46, 46)
+
+
+# class A():
+#     def __init__(self):
+#         self.name = "djidj"
+
+
+# class B(A):
+#     def __init__(self):
+#         super.__init__(self)
+
+#     def getMyName(self):
+#         print(self.name)
+
+
+class EnemyManager(pg.sprite.Group):
+    def __init__(self):
+        super(EnemyManager, self).__init__()
+        # self.enemy_objects = []
+
+    def add(self, *sprites):
+        super().add(*sprites)
+
+    def update(self, *args):
+        for enemy in self.sprites():
+            enemy.update(*args)
+            self.collided(enemy)
+
+    def collided(self, spriteC):
+        for sprite in self.sprites():
+            if sprite != spriteC and sprite.rect.colliderect(spriteC):
+                A_x = sprite.rect.x
+                A_y = sprite.rect.y
+                B_x = spriteC.rect.x
+                B_y = spriteC.rect.y
+                A_to_B = atan2(B_y-A_y, B_x-A_x)
+                reverse = tools.Vector(
+                    30, tools.Vector.getReverseDirection(A_to_B))
+                sprite.exact_pos = [
+                    A_x + reverse.getComponents()[0], A_y + reverse.getComponents()[1]]
+
+    def generate(self, number=1):
+        for _ in range(number):
+            self.add(Enemy())
+
+    def draw(self, surface):
+        for enemy in self.sprites():
+            enemy.draw(surface)
+
+    def remove(self, *sprites):
+        super(EnemyManager, self).remove(*sprites)
+        # for sprite in sprites:
+        #     self.enemy_objects.remove(sprite)
 
 
 class Enemy(tools._BaseSprite):
@@ -16,14 +70,16 @@ class Enemy(tools._BaseSprite):
     """
 
     def __init__(self, *groups):
+        x = random.randint(20, prepare.SCREEN_SIZE[0] - 20)
+        y = random.randint(20, prepare.SCREEN_SIZE[1] - 20)
         tools._BaseSprite.__init__(
-            self, prepare.STARTING_POS, CELL_SIZE, *groups)
+            self, (x, y), CELL_SIZE, *groups)
         # self.controls = prepare.DEFAULT_CONTROLS
 
         self.mask = self.make_mask()
         self.direction = "right"
         self.direction_stack = []
-        self.speed = 2
+        self.speed = 5
         self.angle = 0
         self.movement = False
 
@@ -61,12 +117,12 @@ class Enemy(tools._BaseSprite):
         elif self.exact_pos[1] > bottom:
             self.exact_pos[1] = bottom
 
-    def update_angle(self, position):
-        # Gets position of the mouse
-        playerx, playery = position
-        # To calculate the angle
-        self.angle = atan2(-(playerx -
-                             self.rect.center[1]), (playery - self.rect.center[0])) * 180 / pi
+    # def update_angle(self, position):
+    #     # Gets position of the mouse
+    #     playerx, playery = position
+    #     # To calculate the angle
+    #     self.angle = atan2(-(playerx -
+    #                          self.rect.center[1]), (playery - self.rect.center[0])) * 180 / pi
 
     def rot_center(self, image, angle):
         center = image.get_rect().center
@@ -74,25 +130,30 @@ class Enemy(tools._BaseSprite):
         new_rect = rotated_image.get_rect(center=center)
         return rotated_image, new_rect
 
-    def move(self, playerx, playery):
-        """Move the enemy."""
+    def update_angle(self, playerx, playery):
+        """Update angle."""
         self.angle = atan2(-(playery - self.exact_pos[1]),
                            (playerx - self.exact_pos[0])) * 180 / pi - 90
-        self.exact_pos[0] -= self.speed * cos(self.angle)
-        self.exact_pos[1] += self.speed * sin(self.angle)
+
+    def move(self, playerx, playery):
+        """Move the enemy."""
+        dist = sqrt((playerx-self.rect.x)**2 + (playery-self.rect.y)**2)
+        if not (dist <= 125):
+            self.exact_pos[0] -= self.speed * cos(self.angle)
+            self.exact_pos[1] += self.speed * sin(self.angle)
 
     def update(self, playerx, playery, playerIsMoving, *args):
         """Updates player every frame."""
         if playerIsMoving:
-            print("Player moving")
-            # self.old_pos = self.exact_pos[:]
-            # self.move(playerx, playery)
-            # self.checkOutOfBounds()
-            # self.image = self.make_image(self.enemyImage)
-            # self.rect.center = self.exact_pos
-        else:
-            print("Player not moving")
             self.old_pos = self.exact_pos[:]
+            # self.move(playerx, playery)
+            self.update_angle(playerx, playery)
+            self.checkOutOfBounds()
+            self.image = self.make_image(self.enemyImage)
+            self.rect.center = self.exact_pos
+        else:
+            self.old_pos = self.exact_pos[:]
+            self.update_angle(playerx, playery)
             self.move(playerx, playery)
             self.checkOutOfBounds()
             self.image = self.make_image(self.enemyImage)

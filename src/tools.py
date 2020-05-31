@@ -1,5 +1,78 @@
 import sys
 import pygame as pg
+import math
+
+
+class Vector:
+    def __init__(self, magnitude, direction):
+        self.magnitude = magnitude
+        self.direction = direction
+
+    def updateVector(self, magnitude, direction):
+        self.magnitude = magnitude
+        self.direction = direction
+
+    @staticmethod
+    def getQuadrant(direction):
+        pi = math.pi
+        boundaries = [-pi, -pi/2, 0, pi/2, pi]
+        quadrants = [3, 4, 1, 2]
+
+        for i in range(len(boundaries)):
+            if direction == boundaries[i]:
+                return quadrants[i]
+            elif direction == boundaries[i+1]:
+                return quadrants[i]
+            elif direction > boundaries[i] and direction < boundaries[i+1]:
+                return quadrants[i]
+
+        return None
+
+    def getTrigRatios(self):
+        direction = self.getDirection()
+        quadrant = self.getQuadrant(direction)
+
+        if quadrant == 1:
+            xfactor = math.cos(direction)
+            yfactor = math.sin(direction)
+        elif quadrant == 2:
+            direction -= math.pi/2
+            xfactor = -math.sin(direction)
+            yfactor = math.cos(direction)
+        elif quadrant == 3:
+            direction = abs(direction)
+            direction -= math.pi/2
+            xfactor = -math.sin(direction)
+            yfactor = -math.cos(direction)
+        else:
+            direction = abs(direction)
+            xfactor = math.cos(direction)
+            yfactor = -math.sin(direction)
+
+        return (xfactor, yfactor)
+
+    def getMagnitude(self):
+        return self.magnitude
+
+    def getDirection(self):
+        return self.direction
+
+    def getXComponent(self):
+        return self.getTrigRatios()[0] * self.getMagnitude()
+
+    def getYComponent(self):
+        return self.getTrigRatios()[1] * self.getMagnitude()
+
+    def getComponents(self):
+        return (self.getXComponent(), self.getYComponent())
+
+    @staticmethod
+    def getReverseDirection(direction):
+        quadrant = Vector.getQuadrant(direction)
+        if quadrant == 1 or quadrant == 2:
+            return -math.pi + direction
+        else:
+            return math.pi + direction
 
 
 class Game(object):

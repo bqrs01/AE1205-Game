@@ -11,15 +11,42 @@ BULLET_SIZE = (16, 16)
 CELL_SIZE = (30, 30)
 
 
-class Enemy(tools._BaseSprite):
+class BulletManager(pg.sprite.Group):
+    def __init__(self):
+        super(BulletManager, self).__init__()
+        # self.enemy_objects = []
+
+    def add(self, *sprites):
+        super().add(*sprites)
+
+    def update(self, *args):
+        for bullet in self.sprites():
+            bullet.update(*args)
+            self.collided(bullet)
+
+    def generate(self, number=1):
+        for _ in range(number):
+            self.add(Bullet())
+
+    def draw(self, surface):
+        for bullet in self.sprites():
+            bullet.draw(surface)
+
+    def remove(self, *sprites):
+        super(BulletManager, self).remove(*sprites)
+        # for sprite in sprites:
+        #     self.enemy_objects.remove(sprite)
+
+
+class Bullet(tools._BaseSprite):
     """
     The class for enemy objects.
     """
 
-    def __init__(self,position, *groups):
-        self.pos = [position[0], position[y]]
-        x = pos[0]
-        y = pos[1]
+    def __init__(self, position, *groups):
+        self.pos = [position[0], position[1]]
+        x = self.pos[0]
+        y = self.pos[1]
         tools._BaseSprite.__init__(
             self, (x, y), CELL_SIZE, *groups)
         # self.controls = prepare.DEFAULT_CONTROLS
@@ -56,25 +83,26 @@ class Enemy(tools._BaseSprite):
         right = prepare.SCREEN_SIZE[0] - ((self.rect.width) / 2)
         bottom = prepare.SCREEN_SIZE[1] - (self.rect.height / 2)
 
-        #Have to check this, what we want is if it touches bounds, then delete
+        # Have to check this, what we want is if it touches bounds, then delete
         if self.exact_pos[0] < 0 or self.exact_pos[0] > right or \
                 self.exact_pos[1] < 0 or self.exact_pos[1] > bottom:
-                    return -1
+            return -1
         else:
             pass
 
     def rot_center(self, image, angle):
+        self.angle = angle
         center = image.get_rect().center
         rotated_image = pg.transform.rotate(image, angle)
         new_rect = rotated_image.get_rect(center=center)
         return rotated_image, new_rect
 
-    def move(self, playerx, playery, angle):
+    def move(self):
         """Move the bullet."""
-        self.exact_pos[0] += self.speed * cos(angle)
-        self.exact_pos[1] += self.speed * sin(angle)
+        self.exact_pos[0] += self.speed * cos(self.angle)
+        self.exact_pos[1] += self.speed * sin(self.angle)
 
-    def update(self, playerx, playery, playerIsMoving, *args):
+    def update(self, *args):
         """Updates player every frame."""
         self.old_pos = self.exact_pos[:]
         self.move()

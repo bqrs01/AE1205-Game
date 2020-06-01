@@ -74,7 +74,11 @@ class Bullet(tools._BaseSprite):
 
         mouse_position = self.owner.mouse_position
 
-        self.angle = self.owner.angle
+        dis = tools.Vector(
+            self.speed, atan2(-(mouse_position[1]-y), (mouse_position[0]-x)))
+
+        self.angle = (dis.direction * 180/pi) - 90
+        self.angle2 = (dis.direction * 180/pi)
         self.movement = False
 
         self.bulletImage = pg.image.load(
@@ -119,12 +123,13 @@ class Bullet(tools._BaseSprite):
 
     def move(self):
         """Move the bullet."""
-        vector = tools.Vector(self.speed, self.angle * pi/180)
-        print(self.angle)
-        # self.speed * cos(self.angle * pi/180)
-        #self.exact_pos[0] += vector.getComponents()[0]
-        # self.speed * sin(self.angle * pi/180)
-        #self.exact_pos[1] += vector.getComponents()[1]
+        #vector = tools.Vector(self.speed, self.angle * pi/180)
+        # print(self.angle)
+        #self.speed * cos(self.angle * pi/180)
+        self.exact_pos[0] += self.speed * \
+            cos(self.angle2 * pi/180)  # vector.getComponents()[0]
+        self.exact_pos[1] += self.speed * \
+            -sin(self.angle2 * pi/180)  # vector.getComponents()[1]
 
     def update(self, *args):
         """Updates player every frame."""

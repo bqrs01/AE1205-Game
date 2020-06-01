@@ -2,7 +2,7 @@ import sys
 import pygame as pg
 
 from .. import tools
-from ..components import player, enemy
+from ..components import player, enemy, bullet
 
 
 class GamePlay(tools.State):
@@ -12,9 +12,10 @@ class GamePlay(tools.State):
         # self.rect = pg.Rect((0, 0), (64, 64))
         # self.x_velocity = 1
         # self.y_velocity = -1
-        self.player = player.Player()
-        self.enemyManager = enemy.EnemyManager()
-        self.enemyManager.generate(5)
+        self.bulletManager = bullet.BulletManager()
+        self.enemyManager = enemy.EnemyManager(self.bulletManager)
+        self.player = player.Player(self.bulletManager)
+        self.enemyManager.generate(0)
         self.exit_message = self.font.render(
             "Press ESC to quit.", True, pg.Color('black'))
         self.exit_message_rect = self.exit_message.get_rect(center=(85, 20))
@@ -39,15 +40,18 @@ class GamePlay(tools.State):
             self.player.pop_direction(event.key)
         elif event.type == pg.MOUSEMOTION:
             self.player.update_angle(event.pos)
+        elif event.type == pg.MOUSEBUTTONDOWN:
+            self.player.shoot()
 
     def update(self, dt):
         self.timer += dt
         if round(self.timer) >= 10000:
             self.timer = 0
-            self.enemyManager.generate()
+            # self.enemyManager.generate()
         self.player.update()
         self.enemyManager.update(
             self.player.exact_pos[0], self.player.exact_pos[1], self.player.isMoving)
+        self.bulletManager.update()
 
         if len(pg.sprite.spritecollide(self.player, self.enemyManager, False)) > 0:
             print("Game over")
@@ -66,6 +70,7 @@ class GamePlay(tools.State):
         #pg.draw.rect(surface, pg.Color("darkgreen"), self.rect)
         self.player.draw(surface)
         self.enemyManager.draw(surface)
+        self.bulletManager.draw(surface)
         # pg.draw.lines(surface, (0, 0, 0), False, [
         #     self.player.rect.center, self.player.mouse_position])
         surface.blit(self.exit_message, self.exit_message_rect)

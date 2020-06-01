@@ -7,8 +7,8 @@ import random
 from math import atan2, pi, sqrt, cos, sin
 from .. import prepare, tools
 
-BULLET_SIZE = (16, 16)
-CELL_SIZE = (30, 30)
+BULLET_SIZE = (32, 32)
+CELL_SIZE = (46, 46)
 
 
 class BulletManager(pg.sprite.Group):
@@ -24,9 +24,22 @@ class BulletManager(pg.sprite.Group):
             bullet.update(*args)
             self.collided(bullet)
 
-    def generate(self, number=1):
-        for _ in range(number):
-            self.add(Bullet())
+    def collided(self, spriteC):
+        for sprite in self.sprites():
+            if sprite != spriteC and sprite.rect.colliderect(spriteC):
+                A_x = sprite.rect.x
+                A_y = sprite.rect.y
+                B_x = spriteC.rect.x
+                B_y = spriteC.rect.y
+                A_to_B = atan2(B_y-A_y, B_x-A_x)
+                reverse = tools.Vector(
+                    30, tools.Vector.getReverseDirection(A_to_B))
+                sprite.exact_pos = [
+                    A_x + reverse.getComponents()[0], A_y + reverse.getComponents()[1]]
+
+    def new(self, owner):
+        print(owner)
+        self.add(Bullet(owner))
 
     def draw(self, surface):
         for bullet in self.sprites():
@@ -43,10 +56,13 @@ class Bullet(tools._BaseSprite):
     The class for enemy objects.
     """
 
-    def __init__(self, position, *groups):
+    def __init__(self, owner, *groups):
+        self.owner = owner
+        position = (self.owner.rect.centerx, self.owner.rect.centery)
         self.pos = [position[0], position[1]]
         x = self.pos[0]
         y = self.pos[1]
+
         tools._BaseSprite.__init__(
             self, (x, y), CELL_SIZE, *groups)
         # self.controls = prepare.DEFAULT_CONTROLS
@@ -55,12 +71,15 @@ class Bullet(tools._BaseSprite):
         self.direction = "right"
         self.direction_stack = []
         self.speed = 15
-        self.angle = 0
+
+        mouse_position = self.owner.mouse_position
+
+        self.angle = self.owner.angle
         self.movement = False
 
         self.bulletImage = pg.image.load(
             os.path.join(os.getcwd(), "src/images/redbullet.png"))
-        self.bulletImage = pg.transform.scale(self.bulletImage, (16, 16))
+        self.bulletImage = pg.transform.scale(self.bulletImage, (32, 32))
         self.image = self.make_image(self.bulletImage)
 
     def make_image(self, imageA):
@@ -86,26 +105,30 @@ class Bullet(tools._BaseSprite):
         # Have to check this, what we want is if it touches bounds, then delete
         if self.exact_pos[0] < 0 or self.exact_pos[0] > right or \
                 self.exact_pos[1] < 0 or self.exact_pos[1] > bottom:
+            self.remove()
             return -1
         else:
             pass
 
-    def rot_center(self, image, angle):
-        self.angle = angle
-        center = image.get_rect().center
-        rotated_image = pg.transform.rotate(image, angle)
-        new_rect = rotated_image.get_rect(center=center)
-        return rotated_image, new_rect
+    # def rot_center(self, image, angle):
+    #     self.angle = angle
+    #     center = image.get_rect().center
+    #     rotated_image = pg.transform.rotate(image, angle)
+    #     new_rect = rotated_image.get_rect(center=center)
+    #     return rotated_image, new_rect
 
     def move(self):
         """Move the bullet."""
-        self.exact_pos[0] += self.speed * cos(self.angle)
-        self.exact_pos[1] += self.speed * sin(self.angle)
+        vector = tools.Vector(self.speed, self.angle * pi/180)
+        print(self.angle)
+        # self.speed * cos(self.angle * pi/180)
+        #self.exact_pos[0] += vector.getComponents()[0]
+        # self.speed * sin(self.angle * pi/180)
+        #self.exact_pos[1] += vector.getComponents()[1]
 
     def update(self, *args):
         """Updates player every frame."""
         self.old_pos = self.exact_pos[:]
         self.move()
         self.checkOutOfBounds()
-        self.image = self.make_image(self.bulletImage)
         self.rect.center = self.exact_pos

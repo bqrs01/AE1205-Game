@@ -25,9 +25,10 @@ CELL_SIZE = (46, 46)
 
 
 class EnemyManager(pg.sprite.Group):
-    def __init__(self):
+    def __init__(self, bulletManager):
         super(EnemyManager, self).__init__()
         # self.enemy_objects = []
+        self.bulletManager = bulletManager
 
     def add(self, *sprites):
         super().add(*sprites)
@@ -52,7 +53,7 @@ class EnemyManager(pg.sprite.Group):
 
     def generate(self, number=1):
         for _ in range(number):
-            self.add(Enemy())
+            self.add(Enemy(self.bulletManager))
 
     def draw(self, surface):
         for enemy in self.sprites():
@@ -69,13 +70,14 @@ class Enemy(tools._BaseSprite):
     The class for enemy objects.
     """
 
-    def __init__(self, *groups):
+    def __init__(self, bulletManager, *groups):
         x = random.randint(20, prepare.SCREEN_SIZE[0] - 20)
         y = random.randint(20, prepare.SCREEN_SIZE[1] - 20)
         tools._BaseSprite.__init__(
             self, (x, y), CELL_SIZE, *groups)
         # self.controls = prepare.DEFAULT_CONTROLS
 
+        self.bulletManager = bulletManager
         self.mask = self.make_mask()
         self.direction = "right"
         self.direction_stack = []
@@ -141,6 +143,10 @@ class Enemy(tools._BaseSprite):
         if not (dist <= 125):
             self.exact_pos[0] -= self.speed * cos(self.angle)
             self.exact_pos[1] += self.speed * sin(self.angle)
+
+    def shoot(self):
+        """Intialise a bullet and shoot."""
+        self.bulletManager.new(self)
 
     def update(self, playerx, playery, playerIsMoving, *args):
         """Updates player every frame."""

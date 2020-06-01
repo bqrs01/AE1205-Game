@@ -16,10 +16,12 @@ class Player(tools._BaseSprite):
     track of scores, health and more.
     """
 
-    def __init__(self, *groups):
+    def __init__(self, bulletManager, *groups):
         tools._BaseSprite.__init__(
             self, prepare.STARTING_POS, CELL_SIZE, *groups)
         self.controls = prepare.DEFAULT_CONTROLS
+
+        self.bulletManager = bulletManager
 
         self.mask = self.make_mask()
         self.direction = "right"
@@ -60,6 +62,10 @@ class Player(tools._BaseSprite):
             if direction in self.direction_stack:
                 self.direction_stack.remove(direction)
             self.direction_stack.append(direction)
+        # if key == pg.MOUSEBUTTONDOWN:
+        #     self.shoot(self)
+        # else:
+        #     print(key)
 
     def pop_direction(self, key):
         """Pop a released key from the direction stack."""
@@ -81,6 +87,10 @@ class Player(tools._BaseSprite):
         elif self.exact_pos[1] > bottom:
             self.exact_pos[1] = bottom
 
+    def shoot(self):
+        """Shoot a bullet."""
+        self.bulletManager.new(self)
+
     def update_angle(self, position):
         # Gets position of the mouse
         mousex, mousey = position
@@ -90,11 +100,11 @@ class Player(tools._BaseSprite):
 
         self.mouse_position = position
 
-    def rot_center(self, image, angle):
-        center = image.get_rect().center
-        rotated_image = pg.transform.rotate(image, angle)
-        new_rect = rotated_image.get_rect(center=center)
-        return rotated_image, new_rect
+    # def rot_center(self, image, angle):
+    #     center = image.get_rect().center
+    #     rotated_image = pg.transform.rotate(image, angle)
+    #     new_rect = rotated_image.get_rect(center=center)
+    #     return rotated_image, new_rect
 
     def move(self):
         """Move the player."""

@@ -35,8 +35,10 @@ class Player(tools._BaseSprite):
         self.isMoving = False
 
         self.safe_zone = False
-        self.timer = False
-        self.timer_time = 5000
+        self.sz_timer = False
+        self.sz_time = 5000
+
+        self.bullet_cooldown = 0
 
         self.playerImage = pg.image.load(
             os.path.join(os.getcwd(), "src/images/redplain.png"))
@@ -94,7 +96,9 @@ class Player(tools._BaseSprite):
 
     def shoot(self):
         """Shoot a bullet."""
-        self.bulletManager.new(self, 'redbullet')
+        if (self.bullet_cooldown <= 0) or (self.safe_zone):
+            self.bulletManager.new(self, 'redbullet')
+            self.bullet_cooldown = 1500
 
     def update_angle(self, position):
         # Gets position of the mouse
@@ -107,11 +111,12 @@ class Player(tools._BaseSprite):
 
     def got_shot(self):
         if not self.safe_zone:
-            self.statsManager.dropHealth()
+            self.statsManager.dropHealth(0.5)
             print("got shot. safe zone.")
             self.safe_zone = True
-            self.timer = True
-            self.timer_time = 10000
+            self.bullet_cooldown = 0
+            self.sz_timer = True
+            self.sz_time = 10000
 
     def enemy_shot(self):
         """Increase score when enemy get's shot with player's projectile."""
@@ -143,12 +148,15 @@ class Player(tools._BaseSprite):
 
     def update(self, dt, *args):
         """Updates player every frame."""
-        if self.timer:
-            self.timer_time -= dt
-            if self.timer_time < 0:
+        if self.sz_timer:
+            self.sz_time -= dt
+            if self.sz_time < 0:
                 self.safe_zone = False
-                self.timer = False
+                self.sz_timer = False
                 print('safe zone off')
+
+        if self.bullet_cooldown > 0:
+            self.bullet_cooldown -= dt
 
         if not (self.old_pos == self.exact_pos):
             self.isMoving = True

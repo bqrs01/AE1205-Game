@@ -58,9 +58,9 @@ class GamePlay(tools.State):
         self.score_message = self.font.render(
             f"Score: {self.statsManager.score}", True, pg.Color('black'))
 
-        if len(pg.sprite.spritecollide(self.player, self.enemyManager, False)) > 0:
-            print("Game over")
-            #self.quit = True
+        # if len(pg.sprite.spritecollide(self.player, self.enemyManager, False)) > 0:
+        #     print("Game over")
+        #self.quit = True
         # print(self.x_velocity, self.y_velocity)d
         # self.rect.move_ip(self.x_velocity, (-1) * self.y_velocity)
         # if (self.rect.rightw > self.screen_rect.right or self.rect.left < self.screen_rect.left):
@@ -83,7 +83,7 @@ class GamePlay(tools.State):
 
 class StatsManager():
     def __init__(self):
-        self.score = 0
+        self.score = 0.0
         self.health = 5
         self.gameOver = False
 
@@ -91,9 +91,11 @@ class StatsManager():
         self.score += points
         print(f"Score: {self.score}")
 
-    def dropHealth(self):
-        if self.health == 1:
+    def dropHealth(self, dropBy=1.0):
+        if self.health == 0.5:
             self.health = 0
             self.gameOver = True
 
-        self.health -= 1
+        self.health -= dropBy
+
+        print(f"Health: {self.health}")

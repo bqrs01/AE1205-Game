@@ -3,6 +3,7 @@ This module contains the class for the player.
 """
 import pygame as pg
 import os
+import random
 from math import atan2, pi, sqrt
 from .. import prepare, tools
 
@@ -37,6 +38,8 @@ class Player(tools._BaseSprite):
         self.safe_zone = False
         self.sz_timer = False
         self.sz_time = 5000
+        self.blink_on = False
+        self.blink_cooldown = 150
 
         self.bullet_cooldown = 0
 
@@ -49,9 +52,15 @@ class Player(tools._BaseSprite):
         base = pg.Surface(CELL_SIZE).convert()
         base.fill((255, 255, 255, 0))
         image = base.copy()
-        rotatedImage, origin = tools.rotateImage(image, self.playerImage,
-                                                 (23, 23), (16, 16), self.angle)
-        image.blit(rotatedImage, origin)
+        if (self.safe_zone):
+            if self.blink_on:
+                rotatedImage, origin = tools.rotateImage(image, self.playerImage,
+                                                         (23, 23), (16, 16), self.angle)
+                image.blit(rotatedImage, origin)
+        else:
+            rotatedImage, origin = tools.rotateImage(image, self.playerImage,
+                                                     (23, 23), (16, 16), self.angle)
+            image.blit(rotatedImage, origin)
         return image
 
     def make_mask(self):
@@ -98,7 +107,7 @@ class Player(tools._BaseSprite):
         """Shoot a bullet."""
         if (self.bullet_cooldown <= 0) or (self.safe_zone):
             self.bulletManager.new(self, 'redbullet')
-            self.bullet_cooldown = 1500
+            self.bullet_cooldown = 750
 
     def update_angle(self, position):
         # Gets position of the mouse
@@ -111,12 +120,13 @@ class Player(tools._BaseSprite):
 
     def got_shot(self):
         if not self.safe_zone:
-            self.statsManager.dropHealth(0.5)
+            self.statsManager.dropHealth(5)
             print("got shot. safe zone.")
             self.safe_zone = True
-            self.bullet_cooldown = 0
+            self.bullet_cooldown = 50
+            self.blink_cooldown = 150
             self.sz_timer = True
-            self.sz_time = 10000
+            self.sz_time = 4000
 
     def enemy_shot(self):
         """Increase score when enemy get's shot with player's projectile."""
@@ -150,6 +160,10 @@ class Player(tools._BaseSprite):
         """Updates player every frame."""
         if self.sz_timer:
             self.sz_time -= dt
+            self.blink_cooldown -= dt
+            if self.blink_cooldown <= 0:
+                self.blink_on = not self.blink_on
+                self.blink_cooldown = 150
             if self.sz_time < 0:
                 self.safe_zone = False
                 self.sz_timer = False

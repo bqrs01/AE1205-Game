@@ -52,8 +52,9 @@ class EnemyManager(pg.sprite.Group):
                     A_x + reverse.getComponents()[0], A_y + reverse.getComponents()[1]]
 
     def generate(self, number=1):
-        for _ in range(number):
-            self.add(Enemy(self.bulletManager))
+        if len(self) <= 10:
+            for _ in range(number):
+                self.add(Enemy(self.bulletManager))
 
     def draw(self, surface):
         for enemy in self.sprites():
@@ -179,17 +180,11 @@ class Enemy(tools._BaseSprite):
             if not safe_zone:
                 self.shoot()
 
-        if playerIsMoving:
-            self.old_pos = self.exact_pos[:]
-            # self.move(playerx, playery)
-            self.update_angle(playerx, playery)
-            self.checkOutOfBounds()
-            self.image = self.make_image(self.enemyImage)
-            self.rect.center = self.exact_pos
-        else:
-            self.old_pos = self.exact_pos[:]
-            self.update_angle(playerx, playery)
+        self.old_pos = self.exact_pos[:]
+        self.update_angle(playerx, playery)
+        if not (playerIsMoving or safe_zone):
             self.move(playerx, playery)
-            self.checkOutOfBounds()
-            self.image = self.make_image(self.enemyImage)
-            self.rect.center = self.exact_pos
+
+        self.checkOutOfBounds()
+        self.image = self.make_image(self.enemyImage)
+        self.rect.center = self.exact_pos

@@ -16,6 +16,16 @@ class BulletManager(pg.sprite.Group):
     def __init__(self):
         super(BulletManager, self).__init__()
         # self.enemy_objects = []
+        self.bulletImages = {}
+
+    def load_image(self, colour):
+        if colour in self.bulletImages.keys():
+            return self.bulletImages[colour]
+        else:
+            image = pg.image.load(
+                os.path.join(os.getcwd(), f"src/images/{colour}.png"))
+            self.bulletImages[colour] = image
+            return image
 
     def add(self, *sprites):
         super().add(*sprites)
@@ -60,7 +70,8 @@ class BulletManager(pg.sprite.Group):
     #     return False
 
     def new(self, owner, colour):
-        self.add(Bullet(owner, colour))
+        image = self.load_image(colour)
+        self.add(Bullet(owner, image))
 
     def draw(self, surface):
         for bullet in self.sprites():
@@ -77,7 +88,7 @@ class Bullet(tools._BaseSprite):
     The class for enemy objects.
     """
 
-    def __init__(self, owner, colour, *groups):
+    def __init__(self, owner, image, *groups):
         self.owner = owner
         position = (self.owner.rect.centerx, self.owner.rect.centery)
         self.pos = [position[0], position[1]]
@@ -101,9 +112,9 @@ class Bullet(tools._BaseSprite):
         self.angle2 = (dis.direction * 180/pi)  # For movement
         self.movement = False
 
-        self.bulletImage = pg.image.load(
-            os.path.join(os.getcwd(), f"src/images/{colour}.png"))
-        self.bulletImage = pg.transform.scale(self.bulletImage, (32, 32))
+        # self.bulletImage = pg.image.load(
+        # os.path.join(os.getcwd(), f"src/images/{colour}.png"))
+        self.bulletImage = pg.transform.scale(image, (32, 32))
         self.image = self.make_image(self.bulletImage)
 
     def make_image(self, imageA):
@@ -143,9 +154,9 @@ class Bullet(tools._BaseSprite):
 
     def move(self):
         """Move the bullet."""
-        #vector = tools.Vector(self.speed, self.angle * pi/180)
+        # vector = tools.Vector(self.speed, self.angle * pi/180)
         # print(self.angle)
-        #self.speed * cos(self.angle * pi/180)
+        # self.speed * cos(self.angle * pi/180)
         self.exact_pos[0] += self.speed * \
             cos(self.angle2 * pi/180)  # vector.getComponents()[0]
         self.exact_pos[1] += self.speed * \

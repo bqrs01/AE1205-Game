@@ -4,7 +4,7 @@ which handles the game states in its state_machine dictionary.
 """
 
 from . import prepare, tools
-from .states import splash, gameplay
+from .states import splash, gameplay, gameover
 
 
 def main():
@@ -12,7 +12,8 @@ def main():
     caption = prepare.ORIGINAL_CAPTION
     states = {
         "SPLASH": splash.SplashScreen(),
-        "GAMEPLAY": gameplay.GamePlay()
+        "GAMEPLAY": gameplay.GamePlay(),
+        "GAMEOVER": gameover.GameOver()
     }
 
     game = tools.Game(screen, caption, states, "SPLASH")

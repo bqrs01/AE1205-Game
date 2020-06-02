@@ -16,11 +16,12 @@ class Player(tools._BaseSprite):
     track of scores, health and more.
     """
 
-    def __init__(self, bulletManager, *groups):
+    def __init__(self, bulletManager, statsManager, *groups):
         tools._BaseSprite.__init__(
             self, prepare.STARTING_POS, CELL_SIZE, *groups)
         self.controls = prepare.DEFAULT_CONTROLS
 
+        self.statsManager = statsManager
         self.bulletManager = bulletManager
 
         self.mask = self.make_mask()
@@ -32,6 +33,10 @@ class Player(tools._BaseSprite):
             prepare.SCREEN_SIZE[0]//2, prepare.SCREEN_SIZE[1]//2)
         self.movement = False
         self.isMoving = False
+
+        self.safe_zone = False
+        self.timer = False
+        self.timer_time = 5000
 
         self.playerImage = pg.image.load(
             os.path.join(os.getcwd(), "src/images/redplain.png"))
@@ -100,6 +105,21 @@ class Player(tools._BaseSprite):
 
         self.target_position = position
 
+    def got_shot(self):
+        if not self.safe_zone:
+            self.statsManager.dropHealth()
+            print("got shot. safe zone.")
+            self.safe_zone = True
+            self.timer = True
+            self.timer_time = 10000
+
+    def enemy_shot(self):
+        """Increase score when enemy get's shot with player's projectile."""
+        if self.safe_zone:
+            self.statsManager.addScore(5)
+        else:
+            self.statsManager.addScore(10)
+
     def move(self):
         """Move the player."""
         if self.direction_stack:
@@ -121,8 +141,15 @@ class Player(tools._BaseSprite):
             self.exact_pos[0] += self.speed*vector[0]
             self.exact_pos[1] += self.speed*vector[1]
 
-    def update(self, *args):
+    def update(self, dt, *args):
         """Updates player every frame."""
+        if self.timer:
+            self.timer_time -= dt
+            if self.timer_time < 0:
+                self.safe_zone = False
+                self.timer = False
+                print('safe zone off')
+
         if not (self.old_pos == self.exact_pos):
             self.isMoving = True
         else:

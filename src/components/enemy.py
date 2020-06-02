@@ -153,7 +153,7 @@ class Enemy(tools._BaseSprite):
         """Intialise a bullet and shoot."""
         self.bulletManager.new(self, 'blackbullet')
 
-    def update(self, playerx, playery, playerIsMoving, *args):
+    def update(self, playerx, playery, playerIsMoving, safe_zone, *args):
         """Updates player every frame."""
         if self.isStart:
             # Check if enemy is close to player
@@ -176,7 +176,8 @@ class Enemy(tools._BaseSprite):
         # Randomly decide to shoot
         rn = random.randint(1, 200)
         if rn == 57:
-            self.shoot()
+            if not safe_zone:
+                self.shoot()
 
         if playerIsMoving:
             self.old_pos = self.exact_pos[:]

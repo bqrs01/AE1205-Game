@@ -25,7 +25,7 @@ class BulletManager(pg.sprite.Group):
             bullet.update(*args)
 
         self.checkCollisionWithPlayer(player)
-        self.checkCollisionWithEnemy(enemyManager)
+        self.checkCollisionWithEnemy(enemyManager, player)
 
     def checkCollisionWithPlayer(self, player):
         collisions = pg.sprite.spritecollide(
@@ -35,16 +35,20 @@ class BulletManager(pg.sprite.Group):
             c_with_pl = pg.sprite.collide_rect(player, bullet)
             if not (c_with_pl and bullet.owner == player):
                 bullet.kill()
+                player.got_shot()
                 # print("You got shot!")
                 # Keep score....
 
-    def checkCollisionWithEnemy(self, enemyManager):
+    def checkCollisionWithEnemy(self, enemyManager, player):
         collisions = pg.sprite.groupcollide(self, enemyManager, False, False)
         # {bullet1: enemy3, bullet2: enemy4}
         for bullet in collisions:
             enemyCollided = collisions[bullet]
             if not (type(bullet.owner) == enemy.Enemy):
                 bullet.kill()
+                # Player shot enemy successfully
+                enemyCollided[0].kill()
+                player.enemy_shot()
 
     # def checkIfCollidedIsPlayer(self, player, bullet):
     #     if bullet.owner == player:

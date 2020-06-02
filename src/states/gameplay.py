@@ -12,13 +12,14 @@ class GamePlay(tools.State):
         # self.rect = pg.Rect((0, 0), (64, 64))
         # self.x_velocity = 1
         # self.y_velocity = -1
+        self.statsManager = StatsManager()
         self.bulletManager = bullet.BulletManager()
         self.enemyManager = enemy.EnemyManager(self.bulletManager)
-        self.player = player.Player(self.bulletManager)
+        self.player = player.Player(self.bulletManager, self.statsManager)
         self.enemyManager.generate(1)
-        self.exit_message = self.font.render(
-            "Press ESC to quit.", True, pg.Color('black'))
-        self.exit_message_rect = self.exit_message.get_rect(center=(85, 20))
+        self.score_message = self.font.render(
+            "Score: 0", True, pg.Color('black'))
+        self.score_message_rect = self.score_message.get_rect(center=(85, 20))
         self.timer = 0
 
     def handle_event(self, event):
@@ -47,11 +48,15 @@ class GamePlay(tools.State):
         self.timer += dt
         if round(self.timer) >= 10000:
             self.timer = 0
-            self.enemyManager.generate(5)
-        self.player.update()
+            if not (self.player.safe_zone):
+                self.enemyManager.generate(2)
+        self.player.update(dt)
         self.enemyManager.update(
-            self.player.exact_pos[0], self.player.exact_pos[1], self.player.isMoving)
+            self.player.exact_pos[0], self.player.exact_pos[1], self.player.isMoving, self.player.safe_zone)
         self.bulletManager.update(self.player, self.enemyManager)
+
+        self.score_message = self.font.render(
+            f"Score: {self.statsManager.score}", True, pg.Color('black'))
 
         if len(pg.sprite.spritecollide(self.player, self.enemyManager, False)) > 0:
             print("Game over")
@@ -73,4 +78,22 @@ class GamePlay(tools.State):
         self.bulletManager.draw(surface)
         # pg.draw.lines(surface, (0, 0, 0), False, [
         #     self.player.rect.center, self.player.mouse_position])
-        surface.blit(self.exit_message, self.exit_message_rect)
+        surface.blit(self.score_message, self.score_message_rect)
+
+
+class StatsManager():
+    def __init__(self):
+        self.score = 0
+        self.health = 5
+        self.gameOver = False
+
+    def addScore(self, points):
+        self.score += points
+        print(f"Score: {self.score}")
+
+    def dropHealth(self):
+        if self.health == 1:
+            self.health = 0
+            self.gameOver = True
+
+        self.health -= 1

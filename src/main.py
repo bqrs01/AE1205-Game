@@ -9,10 +9,11 @@ from .states import splash, gameplay
 
 def main():
     screen = prepare.get_screen()
+    caption = prepare.ORIGINAL_CAPTION
     states = {
         "SPLASH": splash.SplashScreen(),
         "GAMEPLAY": gameplay.GamePlay()
     }
 
-    game = tools.Game(screen, states, "SPLASH")
+    game = tools.Game(screen, caption, states, "SPLASH")
     game.run()

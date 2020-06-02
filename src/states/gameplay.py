@@ -15,7 +15,7 @@ class GamePlay(tools.State):
         self.bulletManager = bullet.BulletManager()
         self.enemyManager = enemy.EnemyManager(self.bulletManager)
         self.player = player.Player(self.bulletManager)
-        self.enemyManager.generate(0)
+        self.enemyManager.generate(1)
         self.exit_message = self.font.render(
             "Press ESC to quit.", True, pg.Color('black'))
         self.exit_message_rect = self.exit_message.get_rect(center=(85, 20))
@@ -47,18 +47,18 @@ class GamePlay(tools.State):
         self.timer += dt
         if round(self.timer) >= 10000:
             self.timer = 0
-            # self.enemyManager.generate()
+            self.enemyManager.generate(5)
         self.player.update()
         self.enemyManager.update(
             self.player.exact_pos[0], self.player.exact_pos[1], self.player.isMoving)
-        self.bulletManager.update()
+        self.bulletManager.update(self.player, self.enemyManager)
 
         if len(pg.sprite.spritecollide(self.player, self.enemyManager, False)) > 0:
             print("Game over")
-            self.quit = True
-        # print(self.x_velocity, self.y_velocity)
+            #self.quit = True
+        # print(self.x_velocity, self.y_velocity)d
         # self.rect.move_ip(self.x_velocity, (-1) * self.y_velocity)
-        # if (self.rect.right > self.screen_rect.right or self.rect.left < self.screen_rect.left):
+        # if (self.rect.rightw > self.screen_rect.right or self.rect.left < self.screen_rect.left):
         #     self.x_velocity *= -1
         #     self.rect.clamp_ip(self.screen_rect)
         # if (self.rect.top < self.screen_rect.top or self.rect.bottom > self.screen_rect.bottom):

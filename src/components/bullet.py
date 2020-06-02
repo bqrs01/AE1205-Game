@@ -6,6 +6,7 @@ import os
 import random
 from math import atan2, pi, sqrt, cos, sin
 from .. import prepare, tools
+from . import enemy
 
 BULLET_SIZE = (32, 32)
 CELL_SIZE = (46, 46)
@@ -19,27 +20,43 @@ class BulletManager(pg.sprite.Group):
     def add(self, *sprites):
         super().add(*sprites)
 
-    def update(self, *args):
+    def update(self, player, enemyManager, *args):
         for bullet in self.sprites():
             bullet.update(*args)
-            self.collided(bullet)
 
-    def collided(self, spriteC):
-        for sprite in self.sprites():
-            if sprite != spriteC and sprite.rect.colliderect(spriteC):
-                A_x = sprite.rect.x
-                A_y = sprite.rect.y
-                B_x = spriteC.rect.x
-                B_y = spriteC.rect.y
-                A_to_B = atan2(B_y-A_y, B_x-A_x)
-                reverse = tools.Vector(
-                    30, tools.Vector.getReverseDirection(A_to_B))
-                sprite.exact_pos = [
-                    A_x + reverse.getComponents()[0], A_y + reverse.getComponents()[1]]
+        self.checkCollisionWithPlayer(player)
+        self.checkCollisionWithEnemy(enemyManager)
 
-    def new(self, owner):
-        print(owner)
-        self.add(Bullet(owner))
+    def checkCollisionWithPlayer(self, player):
+        collisions = pg.sprite.spritecollide(
+            player, self, False)
+        # print(collisions)
+        for bullet in collisions:
+            c_with_pl = pg.sprite.collide_rect(player, bullet)
+            if not (c_with_pl and bullet.owner == player):
+                bullet.kill()
+                # print("You got shot!")
+                # Keep score....
+
+    def checkCollisionWithEnemy(self, enemyManager):
+        collisions = pg.sprite.groupcollide(self, enemyManager, False, False)
+        # {bullet1: enemy3, bullet2: enemy4}
+        for bullet in collisions:
+            enemyCollided = collisions[bullet]
+            if not (type(bullet.owner) == enemy.Enemy):
+                bullet.kill()
+
+    # def checkIfCollidedIsPlayer(self, player, bullet):
+    #     if bullet.owner == player:
+    #         print('player bullet')
+    #         return False
+    #     elif type(bullet.owner) == enemy.Enemy:
+    #         print('enemy bullet')
+    #         return False
+    #     return False
+
+    def new(self, owner, colour):
+        self.add(Bullet(owner, colour))
 
     def draw(self, surface):
         for bullet in self.sprites():
@@ -56,7 +73,7 @@ class Bullet(tools._BaseSprite):
     The class for enemy objects.
     """
 
-    def __init__(self, owner, *groups):
+    def __init__(self, owner, colour, *groups):
         self.owner = owner
         position = (self.owner.rect.centerx, self.owner.rect.centery)
         self.pos = [position[0], position[1]]
@@ -65,24 +82,23 @@ class Bullet(tools._BaseSprite):
 
         tools._BaseSprite.__init__(
             self, (x, y), CELL_SIZE, *groups)
-        # self.controls = prepare.DEFAULT_CONTROLS
 
         self.mask = self.make_mask()
         self.direction = "right"
         self.direction_stack = []
         self.speed = 15
 
-        mouse_position = self.owner.mouse_position
+        target_position = self.owner.target_position
 
         dis = tools.Vector(
-            self.speed, atan2(-(mouse_position[1]-y), (mouse_position[0]-x)))
+            self.speed, atan2(-(target_position[1]-y), (target_position[0]-x)))
 
-        self.angle = (dis.direction * 180/pi) - 90
-        self.angle2 = (dis.direction * 180/pi)
+        self.angle = (dis.direction * 180/pi) - 90  # For image creation
+        self.angle2 = (dis.direction * 180/pi)  # For movement
         self.movement = False
 
         self.bulletImage = pg.image.load(
-            os.path.join(os.getcwd(), "src/images/redbullet.png"))
+            os.path.join(os.getcwd(), f"src/images/{colour}.png"))
         self.bulletImage = pg.transform.scale(self.bulletImage, (32, 32))
         self.image = self.make_image(self.bulletImage)
 
@@ -109,7 +125,7 @@ class Bullet(tools._BaseSprite):
         # Have to check this, what we want is if it touches bounds, then delete
         if self.exact_pos[0] < 0 or self.exact_pos[0] > right or \
                 self.exact_pos[1] < 0 or self.exact_pos[1] > bottom:
-            self.remove()
+            self.remove()  # Removes bullet if touches boundary
             return -1
         else:
             pass

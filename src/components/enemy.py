@@ -73,6 +73,7 @@ class Enemy(tools._BaseSprite):
     def __init__(self, bulletManager, *groups):
         x = random.randint(20, prepare.SCREEN_SIZE[0] - 20)
         y = random.randint(20, prepare.SCREEN_SIZE[1] - 20)
+
         tools._BaseSprite.__init__(
             self, (x, y), CELL_SIZE, *groups)
         # self.controls = prepare.DEFAULT_CONTROLS
@@ -84,6 +85,10 @@ class Enemy(tools._BaseSprite):
         self.speed = 5
         self.angle = 0
         self.movement = False
+
+        self.isStart = True
+
+        self.target_position = (x, y)
 
         self.enemyImage = pg.image.load(
             os.path.join(os.getcwd(), "src/images/whiteplain3.png"))
@@ -146,10 +151,33 @@ class Enemy(tools._BaseSprite):
 
     def shoot(self):
         """Intialise a bullet and shoot."""
-        self.bulletManager.new(self)
+        self.bulletManager.new(self, 'blackbullet')
 
     def update(self, playerx, playery, playerIsMoving, *args):
         """Updates player every frame."""
+        if self.isStart:
+            # Check if enemy is close to player
+            dist = sqrt((playerx-self.rect.x)**2 + (playery-self.rect.y)**2)
+            print(dist)
+            while True:
+                if dist <= 125:
+                    self.rect.x = random.randint(
+                        20, prepare.SCREEN_SIZE[0] - 20)
+                    self.rect.y = random.randint(
+                        20, prepare.SCREEN_SIZE[1] - 20)
+                    dist = sqrt((playerx-self.rect.x)**2 +
+                                (playery-self.rect.y)**2)
+                else:
+                    break
+            self.isStart = False
+
+        self.target_position = (playerx, playery)
+
+        # Randomly decide to shoot
+        rn = random.randint(1, 200)
+        if rn == 57:
+            self.shoot()
+
         if playerIsMoving:
             self.old_pos = self.exact_pos[:]
             # self.move(playerx, playery)

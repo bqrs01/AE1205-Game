@@ -76,7 +76,7 @@ class Vector:
 
 
 class Game(object):
-    def __init__(self, screen, states, start_state):
+    def __init__(self, screen, caption, states, start_state):
         """
         Initialise the Game object, and save some important variables.
         """
@@ -84,6 +84,8 @@ class Game(object):
         self.screen = screen
         self.clock = pg.time.Clock()
         self.fps = 60
+        self.fps_visible = False
+        self.caption = caption
         self.states = states
         self.state_name = start_state
         self.state = self.states[self.state_name]
@@ -91,6 +93,8 @@ class Game(object):
     def event_loop(self):
         """Events are passed to current state"""
         for event in pg.event.get():
+            if event.type == pg.KEYDOWN and event.key == pg.K_F5:
+                self.toggle_show_fps(event.key)
             self.state.handle_event(event)
 
     def switch_state(self):
@@ -103,6 +107,13 @@ class Game(object):
         self.state = self.states[self.state_name]
         self.state.startup(game_data)
 
+    def toggle_show_fps(self, key):
+        """Press f5 to turn on/off displaying the framerate in the caption."""
+        if key == pg.K_F5:
+            self.fps_visible = not self.fps_visible
+            if not self.fps_visible:
+                pg.display.set_caption(self.caption)
+
     def update(self, dt):
         """Check for state switch and update state if needed"""
         if self.state.quit:
@@ -114,6 +125,16 @@ class Game(object):
     def draw(self):
         """Pass surface to state for drawing"""
         self.state.draw(self.screen)
+        self.show_fps()
+
+    def show_fps(self):
+        """
+        Display the current FPS in the window handle if fps_visible is True.
+        """
+        if self.fps_visible:
+            fps = self.clock.get_fps()
+            with_fps = "{} - {:.2f} FPS".format(self.caption, fps)
+            pg.display.set_caption(with_fps)
 
     def run(self):
         """Game loop will run in the while loop here"""

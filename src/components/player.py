@@ -28,7 +28,7 @@ class Player(tools._BaseSprite):
         self.direction_stack = []
         self.speed = 8
         self.angle = 0
-        self.mouse_position = (
+        self.target_position = (
             prepare.SCREEN_SIZE[0]//2, prepare.SCREEN_SIZE[1]//2)
         self.movement = False
         self.isMoving = False
@@ -89,7 +89,7 @@ class Player(tools._BaseSprite):
 
     def shoot(self):
         """Shoot a bullet."""
-        self.bulletManager.new(self)
+        self.bulletManager.new(self, 'redbullet')
 
     def update_angle(self, position):
         # Gets position of the mouse
@@ -98,13 +98,7 @@ class Player(tools._BaseSprite):
         self.angle = atan2(-(mousey - self.rect.center[1]),
                            (mousex - self.rect.center[0])) * 180 / pi - 90
 
-        self.mouse_position = position
-
-    # def rot_center(self, image, angle):
-    #     center = image.get_rect().center
-    #     rotated_image = pg.transform.rotate(image, angle)
-    #     new_rect = rotated_image.get_rect(center=center)
-    #     return rotated_image, new_rect
+        self.target_position = position
 
     def move(self):
         """Move the player."""

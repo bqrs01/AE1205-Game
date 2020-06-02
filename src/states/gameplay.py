@@ -50,7 +50,7 @@ class GamePlay(tools.State):
                     self.enemyManager.generate(2)
             self.player.update(dt)
             self.enemyManager.update(
-                self.player.exact_pos[0], self.player.exact_pos[1], self.player.isMoving, self.player.safe_zone)
+                self.player.exact_pos[0], self.player.exact_pos[1], self.player.isMoving, self.player.safe_zone, dt)
             self.bulletManager.update(self.player, self.enemyManager)
 
             self.score_message = self.font.render(

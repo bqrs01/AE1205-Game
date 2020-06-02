@@ -91,6 +91,10 @@ class Enemy(tools._BaseSprite):
 
         self.target_position = (x, y)
 
+        self.target_position_t = (x, y)
+        self.capture_position_now = False
+        self.capture_position_time = 0
+
         self.enemyImage = pg.image.load(
             os.path.join(os.getcwd(), "src/images/whiteplain3.png"))
         self.enemyImage = pg.transform.scale(self.enemyImage, (32, 32))
@@ -154,7 +158,7 @@ class Enemy(tools._BaseSprite):
         """Intialise a bullet and shoot."""
         self.bulletManager.new(self, 'blackbullet')
 
-    def update(self, playerx, playery, playerIsMoving, safe_zone, *args):
+    def update(self, playerx, playery, playerIsMoving, safe_zone, dt, *args):
         """Updates player every frame."""
         if self.isStart:
             # Check if enemy is close to player
@@ -174,16 +178,27 @@ class Enemy(tools._BaseSprite):
 
         self.target_position = (playerx, playery)
 
+        # if self.capture_position_time <= 0:
+        #     self.capture_position_now = True
+        #     self.capture_position_time = 6000
+
+        # if self.capture_position_now:
+        #     self.target_position_t = (playerx, playery)
+        #     print(self.target_position_t)
+        #     self.capture_position_now = False
+
+        # self.capture_position_time -= dt
+
         # Randomly decide to shoot
-        rn = random.randint(1, 200)
+        rn = random.randint(1, 1000)
         if rn == 57:
             if not safe_zone:
                 self.shoot()
 
         self.old_pos = self.exact_pos[:]
-        self.update_angle(playerx, playery)
+        self.update_angle(*self.target_position)
         if not (playerIsMoving or safe_zone):
-            self.move(playerx, playery)
+            self.move(*self.target_position)
 
         self.checkOutOfBounds()
         self.image = self.make_image(self.enemyImage)

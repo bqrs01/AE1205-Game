@@ -46,7 +46,7 @@ class GamePlay(tools.State):
 
     def update(self, dt):
         self.timer += dt
-        if round(self.timer) >= 10000:
+        if round(self.timer) >= 3000:
             self.timer = 0
             if not (self.player.safe_zone):
                 self.enemyManager.generate(2)

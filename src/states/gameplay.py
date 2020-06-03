@@ -17,6 +17,10 @@ class GamePlay(tools.State):
         self.score_message = self.font.render(
             "Score: 0", True, pg.Color('black'))
         self.score_message_rect = self.score_message.get_rect(center=(50, 20))
+        self.break_message = self.font.render(
+            "Cooldown", True, pg.Color('green'))
+        self.break_message_rect = self.score_message.get_rect(center=(50, 60))
+        self.onBreak = False
         self.timer = 0
 
     def handle_event(self, event):
@@ -41,12 +45,14 @@ class GamePlay(tools.State):
         self.enemyManager = enemy.EnemyManager(self.bulletManager)
         self.player = player.Player(self.bulletManager, self.statsManager)
 
-        self.enemyManager.generate(4)
+        self.enemyManager.generate(1)
 
     def update(self, dt):
         if not self.statsManager.gameOver:
-            self.timer += dt
-            if round(self.timer) >= 3000:
+            self.timer -= dt
+            if round(self.timer) <= 0:
+                if self.onBreak:
+                    self.onBreak = False
                 self.timer = 0
                 if not (self.player.safe_zone):
                     self.enemyManager.generate(2)
@@ -60,7 +66,9 @@ class GamePlay(tools.State):
 
             # If there are no enemies left...
             if (len(self.enemyManager) == 0) and self.timer != 0:
-                self.enemyManager.generate(3)
+                self.timer = 3500
+                self.onBreak = True
+                # self.enemyManager.generate(3)
         else:
             # Game over. Switch to next state.
             self.next_state = "GAMEOVER"
@@ -89,6 +97,8 @@ class GamePlay(tools.State):
         #     self.player.rect.center, self.player.mouse_position])
         surface.blit(self.score_message, self.score_message_rect)
         self.draw_health(self.statsManager.health, surface)
+        if self.onBreak:
+            surface.blit(self.break_message, self.break_message_rect)
 
     def load_image(self, health):
         if health in self.heartImages.keys():

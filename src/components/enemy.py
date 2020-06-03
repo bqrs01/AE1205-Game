@@ -166,10 +166,6 @@ class Enemy(tools._BaseSprite):
         self.pos += self.vel
         self.checkOutOfBounds()
         self.rect.center = self.pos
-        # dist = (target - self.exact_pos).magnitude()
-        # if not (dist <= 125):
-        #     self.exact_pos[0] -= self.speed * cos(self.angle)
-        #     self.exact_pos[1] += self.speed * sin(self.angle)
 
     def shoot(self):
         """Intialise a bullet and shoot."""
@@ -181,7 +177,7 @@ class Enemy(tools._BaseSprite):
         self.target = vec(playerx, playery)
 
         if self.isStart:
-            # Check if enemy is close to player
+            # Check if enemy is close to player at start
             while True:
                 pos = vec(self.rect.x, self.rect.y)
                 dist = (self.target-pos)
@@ -195,7 +191,11 @@ class Enemy(tools._BaseSprite):
             self.pos = vec(self.rect.x, self.rect.y)
             self.isStart = False
 
-        #self.target_position = (playerx, playery)
+        # For bullet
+        self.target_position = (playerx, playery)
+
+        self.old_pos = self.pos
+        self.update_angle(self.target)
 
         # Randomly decide to shoot
         rn = random.randint(1, 1000)
@@ -203,11 +203,15 @@ class Enemy(tools._BaseSprite):
             if not safe_zone:
                 self.shoot()
 
-        self.old_pos = self.pos
-        self.update_angle(self.target)
         if not (safe_zone):
             # Update velocity, acceleration and position
             self.move(self.target)
+
+        # Randomly decide to shoot
+        rn = random.randint(1, 200)
+        if rn == 57:
+            if not safe_zone:
+                self.shoot()
 
         # self.checkOutOfBounds()
         self.image = self.make_image(self.enemyImage)

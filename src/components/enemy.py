@@ -29,7 +29,7 @@ class EnemyManager(pg.sprite.Group):
         for enemy in self.sprites():
             enemy.update(*args)
             self.collided(enemy)
-            self.checkCollisionWithPlayer()
+            self.checkCollisionWithPlayer(player)
 
     def checkCollisionWithPlayer(self, player):
         pass

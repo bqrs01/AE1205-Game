@@ -99,7 +99,7 @@ class Enemy(tools._BaseSprite):
 
     def make_image(self, imageA):
         base = pg.Surface(CELL_SIZE, pg.SRCALPHA).convert()
-        base.fill((255, 255, 255, 0))
+        #base.fill((255, 255, 255, 0))
         image = base.copy()
         rotatedImage, origin = tools.rotateImage(image, self.enemyImage,
                                                  (23, 23), (16, 16), self.angle)

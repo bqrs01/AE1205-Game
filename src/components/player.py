@@ -44,7 +44,7 @@ class Player(tools._BaseSprite):
         self.bullet_cooldown = 0
 
         self.playerImage = pg.image.load(
-            os.path.join(os.getcwd(), "src/images/redplain.png")).convert()
+            os.path.join(os.getcwd(), "src/images/redplain.png")).convert_alpha()
         self.playerImage = pg.transform.scale(self.playerImage, (32, 32))
         self.image = self.make_image(self.playerImage)
 

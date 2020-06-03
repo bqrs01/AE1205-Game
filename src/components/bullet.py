@@ -23,7 +23,7 @@ class BulletManager(pg.sprite.Group):
             return self.bulletImages[colour]
         else:
             image = pg.image.load(
-                os.path.join(os.getcwd(), f"src/images/{colour}.png")).convert()
+                os.path.join(os.getcwd(), f"src/images/{colour}.png")).convert_alpha()
             self.bulletImages[colour] = image
             return image
 

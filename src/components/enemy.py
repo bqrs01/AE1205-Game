@@ -98,7 +98,7 @@ class Enemy(tools._BaseSprite):
         self.capture_position_time = 0
 
         self.enemyImage = pg.image.load(
-            os.path.join(os.getcwd(), "src/images/whiteplain3.png")).convert()
+            os.path.join(os.getcwd(), "src/images/whiteplain3.png")).convert_alpha()
         self.enemyImage = pg.transform.scale(self.enemyImage, (32, 32))
         self.image = self.make_image(self.enemyImage)
 

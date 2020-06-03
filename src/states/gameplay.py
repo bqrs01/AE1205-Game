@@ -5,6 +5,8 @@ import os
 from .. import tools
 from ..components import player, enemy, bullet
 
+vec = pg.math.Vector2
+
 
 class GamePlay(tools.State):
     def __init__(self):

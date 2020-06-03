@@ -7,21 +7,13 @@ import random
 from math import atan2, pi, sqrt, cos, sin
 from .. import prepare, tools
 
+vec = pg.math.Vector2
+
 ENEMY_SIZE = (32, 32)
 CELL_SIZE = (46, 46)
-
-
-# class A():
-#     def __init__(self):
-#         self.name = "djidj"
-
-
-# class B(A):
-#     def __init__(self):
-#         super.__init__(self)
-
-#     def getMyName(self):
-#         print(self.name)
+MAX_SPEED = 5
+APPROACH_RADIUS = 150
+MAX_FORCE = 0.1
 
 
 class EnemyManager(pg.sprite.Group):
@@ -83,7 +75,12 @@ class Enemy(tools._BaseSprite):
         self.mask = self.make_mask()
         self.direction = "right"
         self.direction_stack = []
-        self.speed = 5
+
+        self.pos = vec(x, y)
+        self.vel = vec(MAX_SPEED, 0).rotate(random.uniform(0, 360))
+        self.acc = vec(0, 0)
+        self.rect.center = self.pos
+
         self.angle = 0
         self.movement = False
 
@@ -119,15 +116,15 @@ class Enemy(tools._BaseSprite):
     def checkOutOfBounds(self):
         right = prepare.SCREEN_SIZE[0] - ((self.rect.width) / 2)
         bottom = prepare.SCREEN_SIZE[1] - (self.rect.height / 2)
-        if self.exact_pos[0] < 0:
-            self.exact_pos[0] = 0
-        elif self.exact_pos[0] > right:
-            self.exact_pos[0] = right
+        if self.pos.x < 0:
+            self.pos.x = 0
+        elif self.pos.x > right:
+            self.pos.x = right
 
-        if self.exact_pos[1] < 0:
-            self.exact_pos[1] = 0
-        elif self.exact_pos[1] > bottom:
-            self.exact_pos[1] = bottom
+        if self.pos.y < 0:
+            self.pos.y = 0
+        elif self.pos.y > bottom:
+            self.pos.y = bottom
 
     # def update_angle(self, position):
     #     # Gets position of the mouse
@@ -142,17 +139,37 @@ class Enemy(tools._BaseSprite):
         new_rect = rotated_image.get_rect(center=center)
         return rotated_image, new_rect
 
-    def update_angle(self, playerx, playery):
+    def update_angle(self, target):
         """Update angle."""
-        self.angle = atan2(-(playery - self.exact_pos[1]),
-                           (playerx - self.exact_pos[0])) * 180 / pi - 90
+        self.angle = atan2(-(target.y - self.pos.y),
+                           (target.x - self.pos.x)) * 180 / pi - 90
 
-    def move(self, playerx, playery):
+    def seek(self, target):
+        self.desired = (target - self.pos)
+        dist = self.desired.length()
+        self.desired.normalize_ip()
+        if dist < APPROACH_RADIUS:
+            self.desired *= (dist / APPROACH_RADIUS) * MAX_SPEED
+        else:
+            self.desired *= MAX_SPEED
+        steer = (self.desired - self.vel)
+        if steer.length() > MAX_FORCE:
+            steer.scale_to_length(MAX_FORCE)
+        return steer
+
+    def move(self, target):
         """Move the enemy."""
-        dist = sqrt((playerx-self.rect.x)**2 + (playery-self.rect.y)**2)
-        if not (dist <= 125):
-            self.exact_pos[0] -= self.speed * cos(self.angle)
-            self.exact_pos[1] += self.speed * sin(self.angle)
+        self.acc = self.seek(target)
+        self.vel += self.acc
+        if self.vel.length() > MAX_SPEED:
+            self.vel.scale_to_length(MAX_SPEED)
+        self.pos += self.vel
+        self.checkOutOfBounds()
+        self.rect.center = self.pos
+        # dist = (target - self.exact_pos).magnitude()
+        # if not (dist <= 125):
+        #     self.exact_pos[0] -= self.speed * cos(self.angle)
+        #     self.exact_pos[1] += self.speed * sin(self.angle)
 
     def shoot(self):
         """Intialise a bullet and shoot."""
@@ -160,34 +177,25 @@ class Enemy(tools._BaseSprite):
 
     def update(self, playerx, playery, playerIsMoving, safe_zone, dt, *args):
         """Updates player every frame."""
+        # Set target vector
+        self.target = vec(playerx, playery)
+
         if self.isStart:
             # Check if enemy is close to player
-            dist = sqrt((playerx-self.rect.x)**2 + (playery-self.rect.y)**2)
-            print(dist)
             while True:
-                if dist <= 125:
+                pos = vec(self.rect.x, self.rect.y)
+                dist = (self.target-pos)
+                if dist.magnitude() <= 125:
                     self.rect.x = random.randint(
                         20, prepare.SCREEN_SIZE[0] - 20)
                     self.rect.y = random.randint(
                         20, prepare.SCREEN_SIZE[1] - 20)
-                    dist = sqrt((playerx-self.rect.x)**2 +
-                                (playery-self.rect.y)**2)
                 else:
                     break
+            self.pos = vec(self.rect.x, self.rect.y)
             self.isStart = False
 
-        self.target_position = (playerx, playery)
-
-        # if self.capture_position_time <= 0:
-        #     self.capture_position_now = True
-        #     self.capture_position_time = 6000
-
-        # if self.capture_position_now:
-        #     self.target_position_t = (playerx, playery)
-        #     print(self.target_position_t)
-        #     self.capture_position_now = False
-
-        # self.capture_position_time -= dt
+        #self.target_position = (playerx, playery)
 
         # Randomly decide to shoot
         rn = random.randint(1, 1000)
@@ -195,11 +203,12 @@ class Enemy(tools._BaseSprite):
             if not safe_zone:
                 self.shoot()
 
-        self.old_pos = self.exact_pos[:]
-        self.update_angle(*self.target_position)
-        if not (playerIsMoving or safe_zone):
-            self.move(*self.target_position)
+        self.old_pos = self.pos
+        self.update_angle(self.target)
+        if not (safe_zone):
+            # Update velocity, acceleration and position
+            self.move(self.target)
 
-        self.checkOutOfBounds()
+        # self.checkOutOfBounds()
         self.image = self.make_image(self.enemyImage)
-        self.rect.center = self.exact_pos
+        self.rect.center = self.pos

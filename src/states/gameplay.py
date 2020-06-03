@@ -13,7 +13,7 @@ class GamePlay(tools.State):
         # Call super to initialise everything needed
         super(GamePlay, self).__init__()
         self.backgroundImage = pg.image.load(
-            os.path.join(os.getcwd(), "src/images/background.png"))
+            os.path.join(os.getcwd(), "src/images/background.png")).convert()
         self.backgroundImage_rect = self.backgroundImage.get_rect(
             topleft=(0, 0))
         self.heartImages = {}
@@ -110,7 +110,7 @@ class GamePlay(tools.State):
             return self.heartImages[health]
         else:
             image = pg.image.load(
-                os.path.join(os.getcwd(), f"src/images/hearts_{health}.png"))
+                os.path.join(os.getcwd(), f"src/images/hearts_{health}.png")).convert()
             self.heartImages[health] = image
             return image
 

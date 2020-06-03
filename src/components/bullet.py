@@ -23,7 +23,7 @@ class BulletManager(pg.sprite.Group):
             return self.bulletImages[colour]
         else:
             image = pg.image.load(
-                os.path.join(os.getcwd(), f"src/images/{colour}.png"))
+                os.path.join(os.getcwd(), f"src/images/{colour}.png")).convert()
             self.bulletImages[colour] = image
             return image
 
@@ -159,9 +159,9 @@ class Bullet(tools._BaseSprite):
         # print(self.angle)
         # self.speed * cos(self.angle * pi/180)
         self.exact_pos[0] += self.speed * \
-                             cos(self.angle2 * pi / 180)  # vector.getComponents()[0]
+            cos(self.angle2 * pi / 180)  # vector.getComponents()[0]
         self.exact_pos[1] += self.speed * \
-                             -sin(self.angle2 * pi / 180)  # vector.getComponents()[1]
+            -sin(self.angle2 * pi / 180)  # vector.getComponents()[1]
 
     def update(self, *args):
         """Updates player every frame."""

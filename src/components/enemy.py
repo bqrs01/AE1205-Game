@@ -12,7 +12,7 @@ vec = pg.math.Vector2
 ENEMY_SIZE = (32, 32)
 CELL_SIZE = (46, 46)
 MAX_SPEED = 5
-APPROACH_RADIUS = 150
+APPROACH_RADIUS = 100
 MAX_FORCE = 0.1
 
 
@@ -25,10 +25,14 @@ class EnemyManager(pg.sprite.Group):
     def add(self, *sprites):
         super().add(*sprites)
 
-    def update(self, *args):
+    def update(self, player, *args):
         for enemy in self.sprites():
             enemy.update(*args)
             self.collided(enemy)
+            self.checkCollisionWithPlayer()
+
+    def checkCollisionWithPlayer(self, player):
+        pass
 
     def collided(self, spriteC):
         for sprite in self.sprites():
@@ -37,11 +41,12 @@ class EnemyManager(pg.sprite.Group):
                 A_y = sprite.rect.y
                 B_x = spriteC.rect.x
                 B_y = spriteC.rect.y
-                A_to_B = atan2(B_y-A_y, B_x-A_x)
-                reverse = tools.Vector(
-                    30, tools.Vector.getReverseDirection(A_to_B))
-                sprite.exact_pos = [
-                    A_x + reverse.getComponents()[0], A_y + reverse.getComponents()[1]]
+                A_to_B = vec((B_x-A_x, B_y-A_y))
+                A_to_B.rotate_ip(180)
+                # reverse = tools.Vector(
+                #     30, tools.Vector.getReverseDirection(A_to_B))
+                b = A_to_B.scale_to_length(sprite.vel.magnitude())
+                sprite.pos += A_to_B
 
     def generate(self, number=1):
         if len(self) <= 10:
@@ -93,7 +98,7 @@ class Enemy(tools._BaseSprite):
         self.capture_position_time = 0
 
         self.enemyImage = pg.image.load(
-            os.path.join(os.getcwd(), "src/images/whiteplain3.png"))
+            os.path.join(os.getcwd(), "src/images/whiteplain3.png")).convert()
         self.enemyImage = pg.transform.scale(self.enemyImage, (32, 32))
         self.image = self.make_image(self.enemyImage)
 
@@ -118,13 +123,13 @@ class Enemy(tools._BaseSprite):
     def checkOutOfBounds(self):
         right = prepare.SCREEN_SIZE[0] - ((self.rect.width) / 2)
         bottom = prepare.SCREEN_SIZE[1] - (self.rect.height / 2)
-        if self.pos.x < 0:
-            self.pos.x = 0
+        if self.pos.x < 23:
+            self.pos.x = 23
         elif self.pos.x > right:
             self.pos.x = right
 
-        if self.pos.y < 0:
-            self.pos.y = 0
+        if self.pos.y < 23:
+            self.pos.y = 23
         elif self.pos.y > bottom:
             self.pos.y = bottom
 

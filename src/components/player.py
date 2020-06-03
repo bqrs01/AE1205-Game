@@ -44,14 +44,14 @@ class Player(tools._BaseSprite):
         self.bullet_cooldown = 0
 
         self.playerImage = pg.image.load(
-            os.path.join(os.getcwd(), "src/images/redplain.png"))
+            os.path.join(os.getcwd(), "src/images/redplain.png")).convert()
         self.playerImage = pg.transform.scale(self.playerImage, (32, 32))
         self.image = self.make_image(self.playerImage)
 
     def make_image(self, imageA):
         base = pg.Surface(CELL_SIZE, pg.SRCALPHA).convert()
         base.fill((255, 255, 0))
-        base.set_colorkey((255,255,0))
+        base.set_colorkey((255, 255, 0))
         image = base.copy()
         if (self.safe_zone):
             if self.blink_on:

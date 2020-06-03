@@ -12,6 +12,10 @@ class GamePlay(tools.State):
     def __init__(self):
         # Call super to initialise everything needed
         super(GamePlay, self).__init__()
+        self.backgroundImage = pg.image.load(
+            os.path.join(os.getcwd(), "src/images/background.png"))
+        self.backgroundImage_rect = self.backgroundImage.get_rect(
+            topleft=(0, 0))
         self.heartImages = {}
         self.heartImage = self.load_image(50)
         self.score_message = self.font.render(
@@ -53,7 +57,7 @@ class GamePlay(tools.State):
             if round(self.timer) <= 0:
                 if self.onBreak:
                     self.onBreak = False
-                self.timer = 0
+                self.timer = 3000
                 if not (self.player.safe_zone):
                     self.enemyManager.generate(2)
             self.player.update(dt)
@@ -65,7 +69,7 @@ class GamePlay(tools.State):
                 f"Score: {self.statsManager.score}", True, pg.Color('black'))
 
             # If there are no enemies left...
-            if (len(self.enemyManager) == 0) and self.timer != 0:
+            if (len(self.enemyManager) == 0) and self.timer >= 0 and not self.onBreak:
                 self.timer = 3500
                 self.onBreak = True
                 # self.enemyManager.generate(3)
@@ -88,7 +92,8 @@ class GamePlay(tools.State):
             #     self.rect.clamp_ip(self.screen_rect)
 
     def draw(self, surface):
-        surface.fill(pg.Color('white'))
+        surface.blit(self.backgroundImage, self.backgroundImage_rect)
+        # surface.fill(pg.Color('white'))
         #pg.draw.rect(surface, pg.Color("darkgreen"), self.rect)
         self.player.draw(surface)
         self.enemyManager.draw(surface)

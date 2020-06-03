@@ -132,7 +132,7 @@ class StatsManager():
     def dropHealth(self, dropBy=10):
         self.health -= dropBy
 
-        if self.health <= 5:
+        if self.health < 5:
             self.health = 0
             self.gameOver = True
 

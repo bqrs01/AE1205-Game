@@ -73,7 +73,7 @@ class GamePlay(tools.State):
                 f"Score: {self.statsManager.score}", True, pg.Color('black'))
 
             # If there are no enemies left...
-            if (len(self.enemyManager) == 0) and not self.onBreak:
+            if (len(self.enemyManager) == 0) and not self.onBreak and not self.player.safe_zone:
                 # self.timer = 3500
                 # self.onBreak = False
                 self.enemyManager.generate(3)

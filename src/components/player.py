@@ -50,7 +50,8 @@ class Player(tools._BaseSprite):
 
     def make_image(self, imageA):
         base = pg.Surface(CELL_SIZE, pg.SRCALPHA).convert()
-        #base.fill((255, 255, 255))
+        base.fill((255, 255, 0))
+        base.set_colorkey((255,255,0))
         image = base.copy()
         if (self.safe_zone):
             if self.blink_on:

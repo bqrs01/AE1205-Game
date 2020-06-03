@@ -106,10 +106,10 @@ class Bullet(tools._BaseSprite):
         target_position = self.owner.target_position
 
         dis = tools.Vector(
-            self.speed, atan2(-(target_position[1]-y), (target_position[0]-x)))
+            self.speed, atan2(-(target_position[1] - y), (target_position[0] - x)))
 
-        self.angle = (dis.direction * 180/pi) - 90  # For image creation
-        self.angle2 = (dis.direction * 180/pi)  # For movement
+        self.angle = (dis.direction * 180 / pi) - 90  # For image creation
+        self.angle2 = (dis.direction * 180 / pi)  # For movement
         self.movement = False
 
         # self.bulletImage = pg.image.load(
@@ -119,7 +119,8 @@ class Bullet(tools._BaseSprite):
 
     def make_image(self, imageA):
         base = pg.Surface(CELL_SIZE).convert()
-        base.fill((255, 255, 255, 0))
+        base.fill((255, 255, 0))
+        base.set_colorkey((255, 255, 0))
         image = base.copy()
         rotatedImage, origin = tools.rotateImage(image, self.bulletImage,
                                                  (23, 23), (16, 16), self.angle)
@@ -158,9 +159,9 @@ class Bullet(tools._BaseSprite):
         # print(self.angle)
         # self.speed * cos(self.angle * pi/180)
         self.exact_pos[0] += self.speed * \
-            cos(self.angle2 * pi/180)  # vector.getComponents()[0]
+                             cos(self.angle2 * pi / 180)  # vector.getComponents()[0]
         self.exact_pos[1] += self.speed * \
-            -sin(self.angle2 * pi/180)  # vector.getComponents()[1]
+                             -sin(self.angle2 * pi / 180)  # vector.getComponents()[1]
 
     def update(self, *args):
         """Updates player every frame."""

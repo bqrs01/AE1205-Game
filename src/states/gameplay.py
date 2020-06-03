@@ -3,7 +3,7 @@ import pygame as pg
 import os
 
 from .. import tools
-from ..components import player, enemy, bullet
+from ..components import player, enemy, bullet, explosion
 
 vec = pg.math.Vector2
 
@@ -47,7 +47,9 @@ class GamePlay(tools.State):
         self.statsManager = StatsManager()
         self.bulletManager = bullet.BulletManager()
         self.enemyManager = enemy.EnemyManager(self.bulletManager)
-        self.player = player.Player(self.bulletManager, self.statsManager)
+        self.explosionManager = explosion.ExplosionManager()
+        self.player = player.Player(
+            self.bulletManager, self.statsManager, self.explosionManager)
 
         self.enemyManager.generate(1)
 
@@ -61,18 +63,20 @@ class GamePlay(tools.State):
                 if not (self.player.safe_zone):
                     self.enemyManager.generate(2)
             self.player.update(dt)
-            self.enemyManager.update(player,
+            self.enemyManager.update(self.player,
                                      self.player.exact_pos[0], self.player.exact_pos[1], self.player.isMoving, self.player.safe_zone, dt)
-            self.bulletManager.update(self.player, self.enemyManager)
+            self.bulletManager.update(
+                self.player, self.enemyManager, self.explosionManager)
+            self.explosionManager.update()
 
             self.score_message = self.font.render(
                 f"Score: {self.statsManager.score}", True, pg.Color('black'))
 
             # If there are no enemies left...
-            if (len(self.enemyManager) == 0) and self.timer >= 0 and not self.onBreak:
-                self.timer = 3500
-                self.onBreak = True
-                # self.enemyManager.generate(3)
+            if (len(self.enemyManager) == 0) and not self.onBreak:
+                # self.timer = 3500
+                # self.onBreak = False
+                self.enemyManager.generate(3)
         else:
             # Game over. Switch to next state.
             self.next_state = "GAMEOVER"
@@ -98,6 +102,7 @@ class GamePlay(tools.State):
         self.player.draw(surface)
         self.enemyManager.draw(surface)
         self.bulletManager.draw(surface)
+        self.explosionManager.draw(surface)
         # pg.draw.lines(surface, (0, 0, 0), False, [
         #     self.player.rect.center, self.player.mouse_position])
         surface.blit(self.score_message, self.score_message_rect)

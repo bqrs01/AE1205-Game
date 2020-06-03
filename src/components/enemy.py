@@ -22,17 +22,31 @@ class EnemyManager(pg.sprite.Group):
         # self.enemy_objects = []
         self.bulletManager = bulletManager
 
-    def add(self, *sprites):
-        super().add(*sprites)
+    # def add(self, *sprites):
+    #     super().add(*sprites)
 
     def update(self, player, *args):
         for enemy in self.sprites():
-            enemy.update(*args)
             self.collided(enemy)
             self.checkCollisionWithPlayer(player)
+            enemy.update(*args)
 
     def checkCollisionWithPlayer(self, player):
-        pass
+        if not player.safe_zone:
+            collisions = pg.sprite.spritecollide(
+                player, self, False)
+
+            if len(collisions) > 0:
+                player.captured()
+            for enemy in collisions:
+                enemy.kill()
+
+        # for enemy in collisions:
+        #     c_with_pl = pg.sprite.collide_rect(player, enemy)
+        #     if not (c_with_pl and bullet.owner == player):
+
+            # print("You got shot!")
+            # Keep score....
 
     def collided(self, spriteC):
         for sprite in self.sprites():
@@ -45,11 +59,11 @@ class EnemyManager(pg.sprite.Group):
                 A_to_B.rotate_ip(180)
                 # reverse = tools.Vector(
                 #     30, tools.Vector.getReverseDirection(A_to_B))
-                b = A_to_B.scale_to_length(sprite.vel.magnitude())
+                A_to_B.scale_to_length(sprite.vel.magnitude())
                 sprite.pos += A_to_B
 
     def generate(self, number=1):
-        if len(self) <= 10:
+        if len(self) <= 8:
             for _ in range(number):
                 self.add(Enemy(self.bulletManager))
 
@@ -77,6 +91,7 @@ class Enemy(tools._BaseSprite):
         # self.controls = prepare.DEFAULT_CONTROLS
 
         self.bulletManager = bulletManager
+
         self.mask = self.make_mask()
         self.direction = "right"
         self.direction_stack = []

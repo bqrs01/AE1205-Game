@@ -17,13 +17,14 @@ class Player(tools._BaseSprite):
     track of scores, health and more.
     """
 
-    def __init__(self, bulletManager, statsManager, *groups):
+    def __init__(self, bulletManager, statsManager, explosionManager, *groups):
         tools._BaseSprite.__init__(
             self, prepare.STARTING_POS, CELL_SIZE, *groups)
         self.controls = prepare.DEFAULT_CONTROLS
 
         self.statsManager = statsManager
         self.bulletManager = bulletManager
+        self.explosionManager = explosionManager
 
         self.mask = self.make_mask()
         self.direction = "right"
@@ -40,6 +41,8 @@ class Player(tools._BaseSprite):
         self.sz_time = 5000
         self.blink_on = False
         self.blink_cooldown = 150
+        self.expl_cooldown = 0
+        self.canPlayerMove = True
 
         self.bullet_cooldown = 0
 
@@ -49,7 +52,7 @@ class Player(tools._BaseSprite):
         self.image = self.make_image(self.playerImage)
 
     def make_image(self, imageA):
-        base = pg.Surface(CELL_SIZE, pg.SRCALPHA).convert()
+        base = pg.Surface(CELL_SIZE, pg.SRCALPHA).convert_alpha()
         base.fill((255, 255, 0))
         base.set_colorkey((255, 255, 0))
         image = base.copy()
@@ -129,6 +132,20 @@ class Player(tools._BaseSprite):
             self.sz_timer = True
             self.sz_time = 4000
 
+    def captured(self):
+        if not self.safe_zone:
+            self.statsManager.dropHealth(10)
+            print("captured. safe zone.")
+            self.safe_zone = True
+            self.bullet_cooldown = 50
+            self.blink_cooldown = 150
+            self.canPlayerMove = False
+            self.sz_timer = True
+            self.sz_time = 4000
+            self.expl_cooldown = 500
+
+            self.explosionManager.new_explosion(tuple(self.exact_pos))
+
     def enemy_shot(self):
         """Increase score when enemy get's shot with player's projectile."""
         if self.safe_zone:
@@ -162,9 +179,12 @@ class Player(tools._BaseSprite):
         if self.sz_timer:
             self.sz_time -= dt
             self.blink_cooldown -= dt
-            if self.blink_cooldown <= 0:
+            self.expl_cooldown -= dt
+            if self.blink_cooldown < 0:
                 self.blink_on = not self.blink_on
                 self.blink_cooldown = 150
+            if self.expl_cooldown < 0:
+                self.canPlayerMove = True
             if self.sz_time < 0:
                 self.safe_zone = False
                 self.sz_timer = False
@@ -178,7 +198,8 @@ class Player(tools._BaseSprite):
         else:
             self.isMoving = False
         self.old_pos = self.exact_pos[:]
-        self.move()
-        self.checkOutOfBounds()
-        self.image = self.make_image(self.playerImage)
-        self.rect.center = self.exact_pos
+        if self.canPlayerMove:
+            self.move()
+            self.checkOutOfBounds()
+            self.image = self.make_image(self.playerImage)
+            self.rect.center = self.exact_pos

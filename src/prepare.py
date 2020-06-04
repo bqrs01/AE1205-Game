@@ -34,6 +34,7 @@ from . import tools
 pg.init()
 
 SCREEN_SIZE = (1200, 700)
+SCREEN_CENTER = (600, 350)
 ORIGINAL_CAPTION = "AE1205 Game"
 
 STARTING_POS = (SCREEN_SIZE[0]//2, SCREEN_SIZE[1]//2)

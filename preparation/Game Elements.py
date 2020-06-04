@@ -4,7 +4,7 @@
  
  Copyright (c) 2020 Mario Padrón Tardáguila & Bryan Quadras
  
- MIT License
+ The MIT License
  
  Permission is hereby granted, free of charge, to any person obtaining a copy of this software 
  and associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -71,7 +71,8 @@ class Player(object):
             # Gets position of the mouse
             mousex, mousey = event.pos
             # To calculate the angle
-            self.angle = atan2(-(mousey - self.y_pos), (mousex - self.x_pos)) * 180 / pi - 90
+            self.angle = atan2(-(mousey - self.y_pos),
+                               (mousex - self.x_pos)) * 180 / pi - 90
             # uses -90 in order to point in the direction of the mouse
 
     def draw(self):
@@ -93,7 +94,8 @@ class Enemy1(object):
         self.img = pg.transform.scale(self.img, (32, 32))
 
     def movement(self, playerx, playery):
-        self.angle = atan2(-(playery - self.y_pos), (playerx - self.x_pos)) * 180 / pi
+        self.angle = atan2(-(playery - self.y_pos),
+                           (playerx - self.x_pos)) * 180 / pi
         self.x_vel = cos(self.angle * pi / 180) * self.vel
         self.y_vel = sin(self.angle * pi / 180) * self.vel
 
@@ -115,7 +117,8 @@ class Enemy2(object):
         self.img = pg.transform.scale(self.img, (32, 32))
 
     def movement(self, playerx, playery):
-        self.angle = atan2(-(playery - self.y_pos), (playerx - self.x_pos)) * 180 / pi
+        self.angle = atan2(-(playery - self.y_pos),
+                           (playerx - self.x_pos)) * 180 / pi
         self.x_vel = cos(self.angle * pi / 180) * self.vel
         self.y_vel = sin(self.angle * pi / 180) * self.vel
 
@@ -135,11 +138,13 @@ class Bullet(object):
         self.vel = 2
         self.x_vel = 0
         self.y_vel = 0
-        self.img = pg.image.load("./images/redbullet")  # // ./images/blackbullet
+        # // ./images/blackbullet
+        self.img = pg.image.load("./images/redbullet")
         self.img = pg.transform.scale(self.img, (16, 16))
 
     def movement(self, playerx, playery, angle):
-        self.x_pos = playerx  # We need to change this so it appears in the middle of the obj in front
+        # We need to change this so it appears in the middle of the obj in front
+        self.x_pos = playerx
         self.y_pos = playery  # Same
         self.x_vel = self.vel * cos(angle)
         self.y_vel = self.vel * sin(angle)

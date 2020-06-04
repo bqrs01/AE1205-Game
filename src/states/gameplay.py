@@ -71,6 +71,13 @@ class GamePlay(tools.State):
         self.dim_screen = pg.Surface(prepare.SCREEN_SIZE).convert_alpha()
         self.dim_screen.fill((0, 0, 0, 180))
 
+        self.isStart = False
+        self.start_message = self.paused_font_sub.render(
+            "Game is about to start!", True, pg.Color('green'))
+        self.start_message_rect = self.start_message.get_rect(
+            center=prepare.SCREEN_CENTER)
+        self.last_update = None
+
     def handle_event(self, event):
         """Function to handle pygame events."""
         if event.type == pg.QUIT:
@@ -102,13 +109,19 @@ class GamePlay(tools.State):
             self.bulletManager, self.statsManager, self.explosionManager)
         # Generate one enemy at start of game.
         self.enemyManager.generate(1)
+        self.isStart = True
+        self.last_update = pg.time.get_ticks()
 
     def update(self, dt):
         """Update function to update sprite position and graphics."""
         if not self.statsManager.gameOver:
             if self.isPaused:
-                # Do not update game if paused.
+                # Do not update game if paused or about to start.
                 pass
+            elif self.isStart:
+                now = pg.time.get_ticks()
+                if (now - self.last_update) > 3000:
+                    self.isStart = False
             else:
                 self.timer -= dt
                 if round(self.timer) <= 0:
@@ -156,6 +169,9 @@ class GamePlay(tools.State):
             surface.blit(self.paused_message, self.paused_message_rect)
             surface.blit(self.paused_message_subtitle,
                          self.paused_message_subtitle_rect)
+        if self.isStart:
+            surface.blit(self.dim_screen, (0, 0))
+            surface.blit(self.start_message, self.start_message_rect)
 
     def load_image(self, health):
         if health in self.heartImages.keys():

@@ -243,7 +243,7 @@ class Enemy(tools._BaseSprite):
         self.update_angle(self.target)
 
         # Randomly decide to shoot
-        rn = random.randint(1, 1000)
+        rn = random.randint(1, 2000)
         if rn == 57:
             if not safe_zone:
                 self.shoot()

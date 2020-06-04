@@ -36,7 +36,7 @@ class ExplosionManager(pg.sprite.Group):
         self.explosion_images = []
         for idx in range(9):
             image = pg.image.load(
-                os.path.join(os.getcwd(), f"src/images/regularExplosion0{idx}.png")).convert()
+                os.path.join(os.getcwd(), f"src/images/regularExplosion0{idx}.png")).convert_alpha()
             image.set_colorkey((0, 0, 0))
             image = pg.transform.scale(image, (75, 75))
             self.explosion_images.append(image)

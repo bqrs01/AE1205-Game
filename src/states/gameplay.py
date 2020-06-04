@@ -78,6 +78,8 @@ class GamePlay(tools.State):
             center=prepare.SCREEN_CENTER)
         self.last_update = None
 
+        self.surface = pg.Surface(prepare.SCREEN_SIZE)
+
     def handle_event(self, event):
         """Function to handle pygame events."""
         if event.type == pg.QUIT:
@@ -86,6 +88,7 @@ class GamePlay(tools.State):
             if event.key == pg.K_ESCAPE:
                 self.next_state = "GAMEOVER"
                 self.game_data['final_score'] = self.statsManager.score
+                self.game_data['game_screen'] = self.surface
                 self.done = True
             elif event.key == pg.K_p:
                 self.isPaused = not self.isPaused
@@ -147,6 +150,7 @@ class GamePlay(tools.State):
             # Game over. Switch to next state.
             self.next_state = "GAMEOVER"
             self.game_data['final_score'] = self.statsManager.score
+            self.game_data['game_screen'] = self.surface
             self.done = True
 
     def draw(self, surface):
@@ -172,6 +176,8 @@ class GamePlay(tools.State):
         if self.isStart:
             surface.blit(self.dim_screen, (0, 0))
             surface.blit(self.start_message, self.start_message_rect)
+
+        self.surface = surface.copy()
 
     def load_image(self, health):
         if health in self.heartImages.keys():

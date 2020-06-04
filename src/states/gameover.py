@@ -25,7 +25,7 @@
 import sys
 import pygame as pg
 
-from .. import tools
+from .. import tools, prepare
 
 
 class GameOver(tools.State):
@@ -41,6 +41,11 @@ class GameOver(tools.State):
             "Game Over!", True, pg.Color("dodgerblue"))
         self.title_rect = self.title.get_rect(center=self.screen_rect.center)
 
+        self.game_surface = game_data['game_screen']
+
+        self.dim_screen = pg.Surface(prepare.SCREEN_SIZE).convert_alpha()
+        self.dim_screen.fill((0, 0, 0, 180))
+
         self.subtitle = self.font.render(
             f"You got a score of {game_data['final_score']}", True, pg.Color('darkgreen'))
         self.subtitle_rect = self.subtitle.get_rect(
@@ -54,6 +59,8 @@ class GameOver(tools.State):
                 self.done = True
 
     def draw(self, surface):
-        surface.fill(pg.Color('gray'))
+        surface.blit(self.game_surface,
+                     self.game_surface.get_rect(topleft=(0, 0)))
+        surface.blit(self.dim_screen, self.dim_screen.get_rect(topleft=(0, 0)))
         surface.blit(self.title, self.title_rect)
         surface.blit(self.subtitle, self.subtitle_rect)

@@ -150,7 +150,7 @@ class Game(object):
         # Game music
         pg.mixer.music.load(os.path.join(
             os.getcwd(), f"src/soundeffects/{filename}"))
-        pg.mixer.music.set_volume(0.05)
+        pg.mixer.music.set_volume(0.12)
         pg.mixer.music.play(start=self.music_start)
 
     def event_loop(self):
@@ -180,7 +180,6 @@ class Game(object):
     def update(self, dt):
         """Check for state switch and update state if needed"""
         if pg.mixer.music.get_pos()//1000 >= self.music_end:
-            print(pg.mixer.music.get_pos()//1000)
             self.music_index = random.randint(0, 11)
             self.music_start = self.music_pos[self.music_index]
             self.music_end = self.music_pos[self.music_index + 1]

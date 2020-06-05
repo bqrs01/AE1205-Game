@@ -88,7 +88,7 @@ class BulletManager(pg.sprite.Group):
                 enemyCollided[0].kill()
                 player.enemy_shot()
                 # Randomly decide if powerup should appear
-                if (random.random() > 0.1):
+                if (random.random() > 0.92):
                     self.powerupManager.new_powerup(enemyPos)
 
     # def checkIfCollidedIsPlayer(self, player, bullet):

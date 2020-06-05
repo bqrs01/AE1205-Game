@@ -45,14 +45,18 @@ class GamePlay(tools.State):
         # Initialise dictionary for health bar.
         self.heartImages = {}
         self.heartImage = self.load_image(50)
+        self.sub_font = pg.font.Font(os.path.join(
+            os.getcwd(), "src/fonts/FORTE.TTF"), 25)
+        self.infobar = pg.Surface((150, 95))
+        self.infobar_rect = self.infobar.get_rect(topleft=(10, 10))
         # Initialise score message text surface.
-        self.score_message = self.font.render(
-            "Score: 0", True, pg.Color('black'))
-        self.score_message_rect = self.score_message.get_rect(center=(50, 20))
+        self.score_message = self.sub_font.render(
+            "Score: 0.0", True, pg.Color('black'))
+        self.score_message_rect = self.score_message.get_rect(topleft=(5, 10))
         # Initialise break message text surface and initialise onBreak, timer properties.
-        self.break_message = self.font.render(
+        self.break_message = self.sub_font.render(
             "Cooldown", True, pg.Color('green'))
-        self.break_message_rect = self.score_message.get_rect(center=(50, 60))
+        self.break_message_rect = self.score_message.get_rect(topleft=(5, 60))
         self.onBreak = False
         self.timer = 0
         # Initialise property isPaused to False.
@@ -81,6 +85,14 @@ class GamePlay(tools.State):
 
         self.surface = pg.Surface(prepare.SCREEN_SIZE)
         self.bgmusic = {}
+
+    def render_infobar(self, surface):
+        self.infobar.fill((0, 255, 255, 100))
+        self.infobar.blit(self.score_message, self.score_message_rect)
+        if self.onBreak:
+            self.infobar.blit(self.break_message, self.break_message_rect)
+        self.draw_health(self.statsManager.health, self.infobar)
+        surface.blit(self.infobar, self.infobar_rect)
 
     def handle_event(self, event):
         """Function to handle pygame events."""
@@ -149,7 +161,7 @@ class GamePlay(tools.State):
                 self.explosionManager.update()
                 self.powerupManager.update(self.player, self.statsManager)
 
-                self.score_message = self.font.render(
+                self.score_message = self.sub_font.render(
                     f"Score: {self.statsManager.score}", True, pg.Color('black'))
 
                 # If there are no enemies left...
@@ -179,10 +191,11 @@ class GamePlay(tools.State):
         self.powerupManager.draw(surface)
         # pg.draw.lines(surface, (0, 0, 0), False, [
         #     self.player.rect.center, self.player.mouse_position])
-        surface.blit(self.score_message, self.score_message_rect)
-        self.draw_health(self.statsManager.health, surface)
-        if self.onBreak:
-            surface.blit(self.break_message, self.break_message_rect)
+        # surface.blit(self.score_message, self.score_message_rect)
+        # self.draw_health(self.statsManager.health, surface)
+
+        self.render_infobar(surface)
+
         if self.isPaused:
             surface.blit(self.dim_screen, (0, 0))
             surface.blit(self.paused_message, self.paused_message_rect)
@@ -199,13 +212,15 @@ class GamePlay(tools.State):
             return self.heartImages[health]
         else:
             image = pg.image.load(
-                os.path.join(os.getcwd(), f"src/images/hearts_{health}.png")).convert()
+                os.path.join(os.getcwd(), f"src/images/hearts_{health}.png")).convert_alpha()
+            image.set_colorkey((0, 0, 0))
+            image = pg.transform.scale(image, (102, 18))
             self.heartImages[health] = image
             return image
 
     def draw_health(self, health, screen):
         self.heartImage = self.load_image(health)
-        screen.blit(self.heartImage, self.heartImage.get_rect(center=(50, 35)))
+        screen.blit(self.heartImage, self.heartImage.get_rect(topleft=(5, 42)))
 
 
 class StatsManager():

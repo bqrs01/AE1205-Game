@@ -152,7 +152,7 @@ class GamePlay(tools.State):
                 if (len(self.enemyManager) == 0):
                     if not self.onBreak and not self.player.safe_zone:
                         self.onBreak = True
-                        self.timer = 3500
+                        self.timer = 1500
                     if self.player.safe_zone:
                         self.onBreak = False
         else:

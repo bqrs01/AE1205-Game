@@ -1,5 +1,28 @@
 """
-This module contains the class for the enemy.
+ File: enemy.py
+ Authors: Mario Padrón Tardáguila & Bryan Quadras
+ 
+ Copyright (c) 2020 Mario Padrón Tardáguila & Bryan Quadras
+ 
+ The MIT License
+ 
+ Permission is hereby granted, free of charge, to any person obtaining a copy of this software 
+ and associated documentation files (the "Software"), to deal in the Software without restriction,
+ including without limitation the rights to use, copy, modify, merge, publish, distribute, 
+ sublicense, and/or sell copies of the Software, and to permit persons to whom the Software 
+ is furnished to do so, subject to the following conditions:
+ 
+ The above copyright notice and this permission notice shall be included in all copies 
+ or substantial portions of the Software.
+ 
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
+ INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR 
+ PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE 
+ FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+
+>>> This module contains the class for the enemy.
 """
 import pygame as pg
 import os
@@ -22,17 +45,31 @@ class EnemyManager(pg.sprite.Group):
         # self.enemy_objects = []
         self.bulletManager = bulletManager
 
-    def add(self, *sprites):
-        super().add(*sprites)
+    # def add(self, *sprites):
+    #     super().add(*sprites)
 
     def update(self, player, *args):
         for enemy in self.sprites():
-            enemy.update(*args)
             self.collided(enemy)
             self.checkCollisionWithPlayer(player)
+            enemy.update(*args)
 
     def checkCollisionWithPlayer(self, player):
-        pass
+        if not player.safe_zone:
+            collisions = pg.sprite.spritecollide(
+                player, self, False)
+
+            if len(collisions) > 0:
+                player.captured()
+            for enemy in collisions:
+                enemy.kill()
+
+        # for enemy in collisions:
+        #     c_with_pl = pg.sprite.collide_rect(player, enemy)
+        #     if not (c_with_pl and bullet.owner == player):
+
+            # print("You got shot!")
+            # Keep score....
 
     def collided(self, spriteC):
         for sprite in self.sprites():
@@ -45,11 +82,11 @@ class EnemyManager(pg.sprite.Group):
                 A_to_B.rotate_ip(180)
                 # reverse = tools.Vector(
                 #     30, tools.Vector.getReverseDirection(A_to_B))
-                b = A_to_B.scale_to_length(sprite.vel.magnitude())
+                A_to_B.scale_to_length(sprite.vel.magnitude())
                 sprite.pos += A_to_B
 
     def generate(self, number=1):
-        if len(self) <= 10:
+        if len(self) <= 8:
             for _ in range(number):
                 self.add(Enemy(self.bulletManager))
 
@@ -77,6 +114,7 @@ class Enemy(tools._BaseSprite):
         # self.controls = prepare.DEFAULT_CONTROLS
 
         self.bulletManager = bulletManager
+
         self.mask = self.make_mask()
         self.direction = "right"
         self.direction_stack = []
@@ -205,7 +243,7 @@ class Enemy(tools._BaseSprite):
         self.update_angle(self.target)
 
         # Randomly decide to shoot
-        rn = random.randint(1, 1000)
+        rn = random.randint(1, 2000)
         if rn == 57:
             if not safe_zone:
                 self.shoot()

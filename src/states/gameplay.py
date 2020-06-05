@@ -160,7 +160,7 @@ class GamePlay(tools.State):
             self.next_state = "GAMEOVER"
             self.game_data['final_score'] = self.statsManager.score
             self.game_data['game_screen'] = self.surface
-            self.bgmusic["pause_music"](3)
+            self.bgmusic["pause_music"](3.5)
             self.done = True
 
     def draw(self, surface):

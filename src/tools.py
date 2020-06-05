@@ -160,20 +160,24 @@ class Game(object):
         self.music_index = random.randint(0, 11)
         self.music_start = self.music_pos[self.music_index]
         self.music_end = self.music_pos[self.music_index + 1]
+        self.music_current_seek = self.music_start
         self.game_music("music.ogg")
 
     def game_music(self, filename):
         # Game music
         pg.mixer.music.load(os.path.join(
             os.getcwd(), f"src/soundeffects/{filename}"))
-        pg.mixer.music.set_volume(0.11)
+        pg.mixer.music.set_volume(0.08)
         pg.mixer.music.play(start=self.music_start)
         self.state.bgmusic = {
             "song_name": song_names[self.music_index], "pause_music": self.pause_music}
 
     def pause_music(self, duration):
         pg.mixer.music.pause()
-        threading.Timer(duration, pg.mixer.music.play).start()
+        threading.Timer(duration, pg.mixer.music.unpause).start()
+
+    # def resume_music(self):
+    #     pg.mixer.music.play(start=)
 
     def event_loop(self):
         """Events are passed to current state"""
@@ -203,6 +207,7 @@ class Game(object):
 
     def update(self, dt):
         """Check for state switch and update state if needed"""
+        self.music_current_seek = pg.mixer.music.get_pos()/1000
         if pg.mixer.music.get_pos()//1000 >= self.music_end:
             self.music_index = random.randint(0, 11)
             self.music_start = self.music_pos[self.music_index]

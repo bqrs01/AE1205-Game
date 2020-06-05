@@ -132,7 +132,7 @@ class Game(object):
         self.done = False
         self.screen = screen
         self.clock = pg.time.Clock()
-        self.fps = 60
+        self.fps = 90
         self.fps_visible = False
         self.caption = caption
         self.states = states

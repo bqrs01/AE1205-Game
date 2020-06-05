@@ -1,5 +1,5 @@
 """
- File: __init__.py
+ File: main_screen.py
  Authors: Mario Padrón Tardáguila & Bryan Quadras
  
  Copyright (c) 2020 Mario Padrón Tardáguila & Bryan Quadras
@@ -54,9 +54,10 @@ class MainScreen(tools.State):
 
         self.mousepos = (0, 0)
 
-        self.button_names = ["playbutton", "settingbutton", "controlsbutton"]
+        self.button_names = ["playbutton", "controlsbutton", "settingbutton"]
         self.button_pos = [260, 380, 500]
         self.button_size = [(300, 90), (300, 90), (300, 90)]
+        self.button_states = ["GAMEPLAY", "CONTROLS", "SETTINGS"]
         self.buttons = []
         self.buttons_focused = []
         self.buttons_rects = []
@@ -92,18 +93,25 @@ class MainScreen(tools.State):
             else:
                 surface.blit(button, self.buttons_rects[i])
 
+    def button_selected(self):
+        if self.focused_button != -1:
+            self.next_state = self.button_states[self.focused_button]
+            self.done = True
+
     def handle_event(self, event):
         if event.type == pg.QUIT:
             self.quit = True
-        elif event.type == pg.KEYDOWN:
-            if event.key == pg.K_SPACE:
-                self.done = True
+        # elif event.type == pg.KEYDOWN:
+        #     if event.key == pg.K_SPACE:
+        #         self.done = True
         elif event.type == pg.MOUSEMOTION:
             self.mousepos = event.pos
+        elif event.type == pg.MOUSEBUTTONUP:
+            self.button_selected()
 
     def check_if_focused(self):
         focus_happened = False
-        for idx, button in enumerate(self.buttons):
+        for idx in range(len(self.buttons)):
             x = self.mousepos[0]
             y = self.mousepos[1]
             button_rect = self.buttons_rects[idx]

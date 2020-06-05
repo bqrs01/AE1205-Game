@@ -28,7 +28,7 @@ import os
 import threading
 
 from .. import tools, prepare
-from ..components import player, enemy, bullet, explosion
+from ..components import player, enemy, bullet, explosion, powerup
 
 vec = pg.math.Vector2
 
@@ -80,6 +80,7 @@ class GamePlay(tools.State):
         self.last_update = None
 
         self.surface = pg.Surface(prepare.SCREEN_SIZE)
+        self.bgmusic = {}
 
     def handle_event(self, event):
         """Function to handle pygame events."""
@@ -107,7 +108,9 @@ class GamePlay(tools.State):
         self.game_data = game_data
         self.statsManager = StatsManager()
         self.soundManager = tools.SoundManager()
-        self.bulletManager = bullet.BulletManager(self.soundManager)
+        self.powerupManager = powerup.PowerupManager(self.statsManager)
+        self.bulletManager = bullet.BulletManager(
+            self.soundManager, self.powerupManager)
         self.enemyManager = enemy.EnemyManager(self.bulletManager)
         self.explosionManager = explosion.ExplosionManager()
         self.player = player.Player(
@@ -144,6 +147,7 @@ class GamePlay(tools.State):
                 self.bulletManager.update(
                     self.player, self.enemyManager, self.explosionManager)
                 self.explosionManager.update()
+                self.powerupManager.update(self.player, self.statsManager)
 
                 self.score_message = self.font.render(
                     f"Score: {self.statsManager.score}", True, pg.Color('black'))
@@ -172,6 +176,7 @@ class GamePlay(tools.State):
         self.enemyManager.draw(surface)
         self.bulletManager.draw(surface)
         self.explosionManager.draw(surface)
+        self.powerupManager.draw(surface)
         # pg.draw.lines(surface, (0, 0, 0), False, [
         #     self.player.rect.center, self.player.mouse_position])
         surface.blit(self.score_message, self.score_message_rect)
@@ -208,9 +213,30 @@ class StatsManager():
         self.score = 0.0
         self.health = 50
         self.gameOver = False
+        self.multiplier = 1.0
+        self.infinity = False
+        self.powerup_active = False
+
+    def set_multiplier(self, mult, resetAfter=20):
+        self.multiplier = mult
+        self.powerup_active = True
+        threading.Timer(resetAfter, self.reset_multiplier).start()
+
+    def reset_multiplier(self):
+        self.multiplier = 1.0
+        self.powerup_active = False
+
+    def set_infinity(self, resetAfter=20):
+        self.infinity = True
+        self.powerup_active = True
+        threading.Timer(resetAfter, self.reset_infinity).start()
+
+    def reset_infinity(self):
+        self.infinity = False
+        self.powerup_active = False
 
     def addScore(self, points):
-        self.score += points
+        self.score += points * self.multiplier
         print(f"Score: {self.score}")
 
     def dropHealth(self, dropBy=10):

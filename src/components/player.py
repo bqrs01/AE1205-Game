@@ -118,15 +118,15 @@ class Player(tools._BaseSprite):
                 self.direction_stack.remove(direction)
 
     def checkOutOfBounds(self):
-        right = prepare.SCREEN_SIZE[0] - ((self.rect.width)/2)
-        bottom = prepare.SCREEN_SIZE[1] - (self.rect.height/2)
-        if self.exact_pos[0] < 0:
-            self.exact_pos[0] = 0
+        right = prepare.SCREEN_SIZE[0] - (self.rect.width//2)
+        bottom = prepare.SCREEN_SIZE[1] - (self.rect.height//2)
+        if self.exact_pos[0] < (self.rect.width//2):
+            self.exact_pos[0] = (self.rect.width//2)
         elif self.exact_pos[0] > right:
             self.exact_pos[0] = right
 
-        if self.exact_pos[1] < 0:
-            self.exact_pos[1] = 0
+        if self.exact_pos[1] < (self.rect.height//2):
+            self.exact_pos[1] = (self.rect.height//2)
         elif self.exact_pos[1] > bottom:
             self.exact_pos[1] = bottom
 

@@ -132,7 +132,7 @@ class Game(object):
         self.done = False
         self.screen = screen
         self.clock = pg.time.Clock()
-        self.fps = 60
+        self.fps = 120
         self.fps_visible = False
         self.caption = caption
         self.states = states
@@ -150,7 +150,7 @@ class Game(object):
         # Game music
         pg.mixer.music.load(os.path.join(
             os.getcwd(), f"src/soundeffects/{filename}"))
-        pg.mixer.music.set_volume(0.12)
+        pg.mixer.music.set_volume(0.11)
         pg.mixer.music.play(start=self.music_start)
 
     def event_loop(self):

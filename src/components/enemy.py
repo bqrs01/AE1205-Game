@@ -226,7 +226,7 @@ class Enemy(tools._BaseSprite):
             while True:
                 pos = vec(self.rect.x, self.rect.y)
                 dist = (self.target-pos)
-                if dist.magnitude() <= 125:
+                if dist.magnitude() <= 500:
                     self.rect.x = random.randint(
                         20, prepare.SCREEN_SIZE[0] - 20)
                     self.rect.y = random.randint(
@@ -251,8 +251,6 @@ class Enemy(tools._BaseSprite):
         if not (safe_zone):
             # Update velocity, acceleration and position
             self.move(self.target)
-
-
 
         # self.checkOutOfBounds()
         self.image = self.make_image(self.enemyImage)

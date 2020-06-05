@@ -71,6 +71,17 @@ class MainScreen(tools.State):
         self.play_button_rect = self.play_button.get_rect(
             center=(prepare.SCREEN_CENTER[0], 200))
 
+        self.bgmusic = {}
+
+        self.sub_font = pg.font.Font(os.path.join(
+            os.getcwd(), "src/fonts/FORTE.TTF"), 35)
+        self.copyright = self.sub_font.render(
+            "Copyright (c) 2020 Mario Padrón Tardáguila & Bryan Quadras", True, pg.color.Color('yellow'))
+        self.copyright_rect = self.copyright.get_rect(center=(600, 615))
+
+        self.sub_font_2 = pg.font.Font(os.path.join(
+            os.getcwd(), "src/fonts/FORTE.TTF"), 18)
+
     def get_button_images(self):
         for i, name in enumerate(self.button_names):
             button = pg.image.load(os.path.join(
@@ -109,6 +120,12 @@ class MainScreen(tools.State):
         elif event.type == pg.MOUSEBUTTONUP:
             self.button_selected()
 
+    def startup(self, game_data):
+        self.current_song = self.sub_font_2.render(
+            f"Song: {self.bgmusic['song_name']}", True, pg.color.Color('green'))
+        self.current_song_rect = self.current_song.get_rect(
+            center=(600, 665))
+
     def check_if_focused(self):
         focus_happened = False
         for idx in range(len(self.buttons)):
@@ -124,10 +141,14 @@ class MainScreen(tools.State):
             self.focused_button = -1
 
     def update(self, dt):
+        self.current_song = self.sub_font_2.render(
+            f"Song: {self.bgmusic['song_name']}", True, pg.color.Color('green'))
         self.check_if_focused()
 
     def draw(self, surface):
         surface.blit(self.image, self.rect)
         surface.blit(self.logo, self.logo_rect)
+        surface.blit(self.copyright, self.copyright_rect)
+        surface.blit(self.current_song, self.current_song_rect)
         #surface.blit(self.play_button, self.play_button_rect)
         self.draw_buttons(surface)

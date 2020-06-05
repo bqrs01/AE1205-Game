@@ -1,23 +1,23 @@
 """
  File: gameplay.py
  Authors: Mario Padrón Tardáguila & Bryan Quadras
- 
+
  Copyright (c) 2020 Mario Padrón Tardáguila & Bryan Quadras
- 
+
  The MIT License
- 
- Permission is hereby granted, free of charge, to any person obtaining a copy of this software 
+
+ Permission is hereby granted, free of charge, to any person obtaining a copy of this software
  and associated documentation files (the "Software"), to deal in the Software without restriction,
- including without limitation the rights to use, copy, modify, merge, publish, distribute, 
- sublicense, and/or sell copies of the Software, and to permit persons to whom the Software 
+ including without limitation the rights to use, copy, modify, merge, publish, distribute,
+ sublicense, and/or sell copies of the Software, and to permit persons to whom the Software
  is furnished to do so, subject to the following conditions:
- 
- The above copyright notice and this permission notice shall be included in all copies 
+
+ The above copyright notice and this permission notice shall be included in all copies
  or substantial portions of the Software.
- 
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
- INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR 
- PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE 
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+ INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+ PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
  FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
  ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
@@ -47,7 +47,7 @@ class GamePlay(tools.State):
         self.heartImage = self.load_image(50)
         self.sub_font = pg.font.Font(os.path.join(
             os.getcwd(), "src/fonts/FORTE.TTF"), 25)
-        self.infobar = pg.Surface((150, 95))
+        self.infobar = pg.Surface((160, 95))
         self.infobar_rect = self.infobar.get_rect(topleft=(10, 10))
 
         # Initialise score message text surface.
@@ -87,9 +87,12 @@ class GamePlay(tools.State):
         self.surface = pg.Surface(prepare.SCREEN_SIZE)
         self.bgmusic = {}
 
+        self.sub_font_2 = pg.font.Font(os.path.join(
+            os.getcwd(), "src/fonts/FORTE.TTF"), 15)
+
     def render_infobar(self, surface):
-        self.infobar.fill((0, 255, 255, 100))
-        self.infobar.set_alpha(100)
+        self.infobar.fill((0, 255, 255))
+        self.infobar.set_alpha(80)
         self.infobar.blit(self.score_message, self.score_message_rect)
         if self.onBreak:
             self.infobar.blit(self.break_message, self.break_message_rect)
@@ -101,13 +104,9 @@ class GamePlay(tools.State):
         if event.type == pg.QUIT:
             self.quit = True
         elif event.type == pg.KEYDOWN:
-            # if event.key == pg.K_ESCAPE:
-            # self.next_state = "GAMEOVER"
-            # self.game_data['final_score'] = self.statsManager.score
-            # self.game_data['game_screen'] = self.surface
-            # self.done = True
             if event.key == pg.K_ESCAPE:
-                self.isPaused = not self.isPaused
+                if not self.isStart:
+                    self.isPaused = not self.isPaused
             else:
                 self.player.add_direction(event.key)
         elif event.type == pg.KEYUP:
@@ -115,7 +114,8 @@ class GamePlay(tools.State):
         elif event.type == pg.MOUSEMOTION:
             self.player.update_angle(event.pos)
         elif event.type == pg.MOUSEBUTTONDOWN:
-            self.player.shoot()
+            if not self.isPaused and not self.isStart and not self.statsManager.infinity:
+                self.player.shoot()
 
     def startup(self, game_data):
         """Startup function that sets up all game constructs."""
@@ -132,13 +132,17 @@ class GamePlay(tools.State):
         # # Generate one enemy at start of game.
         # self.enemyManager.generate(1)
         self.isStart = True
+        self.current_song = self.sub_font_2.render(
+            f"Song: {self.bgmusic['song_name']}", True, pg.color.Color('yellow'))
+        self.current_song_rect = self.current_song.get_rect(
+            bottomleft=(15, 690))
         self.last_update = pg.time.get_ticks()
 
     def update(self, dt):
         """Update function to update sprite position and graphics."""
         if not self.statsManager.gameOver:
             if self.isPaused:
-                # Do not update game if paused or about to start.
+                # Do not update game if paused
                 pass
             elif self.isStart:
                 now = pg.time.get_ticks()
@@ -166,6 +170,9 @@ class GamePlay(tools.State):
                 self.score_message = self.sub_font.render(
                     f"Score: {self.statsManager.score}", True, pg.Color('black'))
 
+                self.current_song = self.sub_font_2.render(
+                    f"Song: {self.bgmusic['song_name']}", True, pg.color.Color('yellow'))
+
                 # If there are no enemies left...
                 if (len(self.enemyManager) == 0):
                     if not self.onBreak and not self.player.safe_zone:
@@ -185,7 +192,7 @@ class GamePlay(tools.State):
         """Draw function to draw all game elements on screen."""
         surface.blit(self.backgroundImage, self.backgroundImage_rect)
         # surface.fill(pg.Color('white'))
-        #pg.draw.rect(surface, pg.Color("darkgreen"), self.rect)
+        # pg.draw.rect(surface, pg.Color("darkgreen"), self.rect)
         self.player.draw(surface)
         self.enemyManager.draw(surface)
         self.bulletManager.draw(surface)
@@ -197,6 +204,8 @@ class GamePlay(tools.State):
         # self.draw_health(self.statsManager.health, surface)
 
         self.render_infobar(surface)
+
+        surface.blit(self.current_song, self.current_song_rect)
 
         if self.isPaused:
             surface.blit(self.dim_screen, (0, 0))
@@ -243,13 +252,18 @@ class StatsManager():
         self.multiplier = 1.0
         self.powerup_active = False
 
-    def set_infinity(self, resetAfter=20):
+    def set_infinity(self, resetAfter=15):
         self.infinity = True
         self.powerup_active = True
         threading.Timer(resetAfter, self.reset_infinity).start()
 
     def reset_infinity(self):
         self.infinity = False
+        self.powerup_active = False
+
+    def reset_powerups(self):
+        self.infinity = False
+        self.multiplier = 1.0
         self.powerup_active = False
 
     def addScore(self, points):
@@ -266,4 +280,4 @@ class StatsManager():
     def declareGameOver(self):
         self.gameOver = True
 
-    #print(f"Health: {self.health}")
+    # print(f"Health: {self.health}")

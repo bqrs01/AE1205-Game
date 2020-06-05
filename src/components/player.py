@@ -134,7 +134,7 @@ class Player(tools._BaseSprite):
         """Shoot a bullet."""
         if (self.bullet_cooldown <= 0) or (self.safe_zone):
             self.bulletManager.new(self, 'redbullet')
-            self.bullet_cooldown = 750
+            self.bullet_cooldown = 400
 
     def update_angle(self, position):
         # Gets position of the mouse
@@ -149,6 +149,7 @@ class Player(tools._BaseSprite):
         if not self.safe_zone:
             self.statsManager.dropHealth(5)
             print("got shot. safe zone.")
+            self.statsManager.reset_powerups()
             self.safe_zone = True
             self.bullet_cooldown = 50
             self.blink_cooldown = 150
@@ -159,6 +160,7 @@ class Player(tools._BaseSprite):
         if not self.safe_zone:
             self.statsManager.dropHealth(10)
             print("captured. safe zone.")
+            self.statsManager.reset_powerups()
             self.safe_zone = True
             self.bullet_cooldown = 50
             self.blink_cooldown = 150
@@ -221,8 +223,7 @@ class Player(tools._BaseSprite):
         else:
             if self.statsManager.infinity:
                 self.shoot()
-                self.bullet_cooldown = 10
-                print('infinity shot')
+                self.bullet_cooldown = 50
 
         if not (self.old_pos == self.exact_pos):
             self.isMoving = True

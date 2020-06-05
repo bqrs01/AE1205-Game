@@ -38,7 +38,8 @@ def main():
         "SPLASH": splash.SplashScreen(),
         "GAMEPLAY": gameplay.GamePlay(),
         "GAMEOVER": gameover.GameOver(),
-        "MAINSCREEN": main_screen.MainScreen()}
+        "MAINSCREEN": main_screen.MainScreen(),
+        "CONTROLS": controls_screen.ControlsScreen()}
 
     game = tools.Game(screen, caption, states, "SPLASH")
     game.run()

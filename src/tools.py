@@ -38,7 +38,8 @@ song_names = [
     "A.L.I.S.O.N - Golden Dust",
     "Stratford Ct. - HOME - Still Life",
     "Unfound - Intercept",
-    "ｌｏｏｓｅｇｏｏｓｅ - ＳＰＲＩＮＧＦＩＥＬＤ ＇９６",
+    # ｌｏｏｓｅｇｏｏｓｅ - ＳＰＲＩＮＧＦＩＥＬＤ ＇９６",
+    "l o o s e g o o s e - S P R I N G F I E L D ' 9 6",
     "Color Index - Intervals (Open Spectrum)",
     "Nowtro - Still Human (Teaser)",
     "Syntax - Syntax - Stratus (f. HOME)",
@@ -148,7 +149,7 @@ class Game(object):
         self.done = False
         self.screen = screen
         self.clock = pg.time.Clock()
-        self.fps = 90
+        self.fps = 60
         self.fps_visible = False
         self.caption = caption
         self.states = states

@@ -106,8 +106,7 @@ class Enemy(tools._BaseSprite):
     """
 
     def __init__(self, bulletManager, *groups):
-        x = random.randint(20, prepare.SCREEN_SIZE[0] - 20)
-        y = random.randint(20, prepare.SCREEN_SIZE[1] - 20)
+        (x, y) = self.random_pos()
 
         tools._BaseSprite.__init__(
             self, (x, y), CELL_SIZE, *groups)
@@ -139,6 +138,13 @@ class Enemy(tools._BaseSprite):
             os.path.join(os.getcwd(), "src/images/whiteplain3.png")).convert_alpha()
         self.enemyImage = pg.transform.scale(self.enemyImage, (32, 32))
         self.image = self.make_image(self.enemyImage)
+
+    def random_pos(self):
+        r_x = random.choice([(40, 100), (1100, 1160)])
+        r_y = random.choice([(40, 100), (600, 660)])
+        x = random.randint(*r_x)
+        y = random.randint(*r_y)
+        return (x, y)
 
     def make_image(self, imageA):
         base = pg.Surface(CELL_SIZE, pg.SRCALPHA).convert()

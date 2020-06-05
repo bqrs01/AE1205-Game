@@ -42,7 +42,7 @@ class SplashScreen(tools.State):
         self.frame_rate = 70
         self.loading = True
         # Set next state
-        self.next_state = "GAMEPLAY"
+        self.next_state = "MAINSCREEN"
         # Set title
         self.title = self.font.render(
             "AE1205 Game (Mario and Bryan)", True, pg.Color("dodgerblue"))

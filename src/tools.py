@@ -28,6 +28,22 @@ import io
 import pygame as pg
 import math
 import random
+import threading
+
+song_names = [
+    "Zane Alexander - D a y",
+    "Emil Rottmayer - Evade",
+    "Unfound - Dawn",
+    "FRACTAL MAN - Glimpses of Starlight",
+    "A.L.I.S.O.N - Golden Dust",
+    "Stratford Ct. - HOME - Still Life",
+    "Unfound - Intercept",
+    "ｌｏｏｓｅｇｏｏｓｅ - ＳＰＲＩＮＧＦＩＥＬＤ ＇９６",
+    "Color Index - Intervals (Open Spectrum)",
+    "Nowtro - Still Human (Teaser)",
+    "Syntax - Syntax - Stratus (f. HOME)",
+    "oDDling - Ascend"
+]
 
 
 class SoundManager:
@@ -152,6 +168,12 @@ class Game(object):
             os.getcwd(), f"src/soundeffects/{filename}"))
         pg.mixer.music.set_volume(0.11)
         pg.mixer.music.play(start=self.music_start)
+        self.state.bgmusic = {
+            "song_name": song_names[self.music_index], "pause_music": self.pause_music}
+
+    def pause_music(self, duration):
+        pg.mixer.music.pause()
+        threading.Timer(duration, pg.mixer.music.play).start()
 
     def event_loop(self):
         """Events are passed to current state"""
@@ -168,6 +190,8 @@ class Game(object):
         self.state_name = next_state
         game_data = self.state.game_data  # Persistent data
         self.state = self.states[self.state_name]
+        self.state.bgmusic = {
+            "song_name": song_names[self.music_index], "pause_music": self.pause_music}
         self.state.startup(game_data)
 
     def toggle_show_fps(self, key):
@@ -183,6 +207,7 @@ class Game(object):
             self.music_index = random.randint(0, 11)
             self.music_start = self.music_pos[self.music_index]
             self.music_end = self.music_pos[self.music_index + 1]
+            self.state.bgmusic["song_name"] = song_names[self.music_index]
             pg.mixer.music.play(start=self.music_start)
         if self.state.quit:
             self.done = True

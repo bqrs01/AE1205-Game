@@ -25,6 +25,7 @@
 import sys
 import pygame as pg
 import os
+import threading
 
 from .. import tools, prepare
 from ..components import player, enemy, bullet, explosion
@@ -65,7 +66,7 @@ class GamePlay(tools.State):
         self.paused_message_rect = self.paused_message.get_rect(
             center=prepare.SCREEN_CENTER)
         self.paused_message_subtitle = self.paused_font_sub.render(
-            "Press p to start playing", True, pg.Color('red'))
+            "Press ESC to start playing", True, pg.Color('red'))
         self.paused_message_subtitle_rect = self.paused_message_subtitle.get_rect(
             center=(prepare.SCREEN_CENTER[0], prepare.SCREEN_CENTER[1]+50))
         self.dim_screen = pg.Surface(prepare.SCREEN_SIZE).convert_alpha()
@@ -90,7 +91,7 @@ class GamePlay(tools.State):
             # self.game_data['final_score'] = self.statsManager.score
             # self.game_data['game_screen'] = self.surface
             # self.done = True
-            if event.key == pg.K_p:
+            if event.key == pg.K_ESCAPE:
                 self.isPaused = not self.isPaused
             else:
                 self.player.add_direction(event.key)
@@ -111,8 +112,8 @@ class GamePlay(tools.State):
         self.explosionManager = explosion.ExplosionManager()
         self.player = player.Player(
             self.bulletManager, self.statsManager, self.explosionManager)
-        # Generate one enemy at start of game.
-        self.enemyManager.generate(1)
+        # # Generate one enemy at start of game.
+        # self.enemyManager.generate(1)
         self.isStart = True
         self.last_update = pg.time.get_ticks()
 
@@ -126,14 +127,17 @@ class GamePlay(tools.State):
                 now = pg.time.get_ticks()
                 if (now - self.last_update) > 3000:
                     self.isStart = False
+                    self.enemyManager.generate(1)
             else:
                 self.timer -= dt
                 if round(self.timer) <= 0:
                     if self.onBreak:
                         self.onBreak = False
-                    self.timer = 3000
-                    if not (self.player.safe_zone):
-                        self.enemyManager.generate(2)
+                    self.timer = 3500
+                    # if not (self.player.safe_zone):
+                    self.enemyManager.generate(2)
+                    # else:
+                    #     self.enemyManager.generate()
                 self.player.update(dt)
                 self.enemyManager.update(self.player,
                                          self.player.exact_pos[0], self.player.exact_pos[1], self.player.isMoving, self.player.safe_zone, dt)
@@ -145,13 +149,18 @@ class GamePlay(tools.State):
                     f"Score: {self.statsManager.score}", True, pg.Color('black'))
 
                 # If there are no enemies left...
-                if (len(self.enemyManager) == 0) and not self.onBreak and not self.player.safe_zone:
-                    self.enemyManager.generate(2)
+                if (len(self.enemyManager) == 0):
+                    if not self.onBreak and not self.player.safe_zone:
+                        self.onBreak = True
+                        self.timer = 3500
+                    if self.player.safe_zone:
+                        self.onBreak = False
         else:
             # Game over. Switch to next state.
             self.next_state = "GAMEOVER"
             self.game_data['final_score'] = self.statsManager.score
             self.game_data['game_screen'] = self.surface
+            self.bgmusic["pause_music"](3)
             self.done = True
 
     def draw(self, surface):
@@ -209,6 +218,9 @@ class StatsManager():
 
         if self.health < 5:
             self.health = 0
-            self.gameOver = True
+            threading.Timer(0.5, self.declareGameOver).start()
 
-        print(f"Health: {self.health}")
+    def declareGameOver(self):
+        self.gameOver = True
+
+    #print(f"Health: {self.health}")

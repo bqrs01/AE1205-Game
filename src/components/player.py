@@ -75,7 +75,7 @@ class Player(tools._BaseSprite):
         self.image = self.make_image(self.playerImage)
 
     def make_image(self, imageA):
-        base = pg.Surface(CELL_SIZE, pg.SRCALPHA).convert_alpha()
+        base = pg.Surface(CELL_SIZE, pg.SRCALPHA).convert()
         base.fill((255, 255, 0))
         base.set_colorkey((255, 255, 0))
         image = base.copy()

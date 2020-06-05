@@ -243,8 +243,8 @@ class Enemy(tools._BaseSprite):
         self.update_angle(self.target)
 
         # Randomly decide to shoot
-        rn = random.randint(1, 2000)
-        if rn == 57:
+        rn = random.randint(1, 600)
+        if rn == 25:
             if not safe_zone:
                 self.shoot()
 
@@ -252,11 +252,7 @@ class Enemy(tools._BaseSprite):
             # Update velocity, acceleration and position
             self.move(self.target)
 
-        # Randomly decide to shoot
-        rn = random.randint(1, 200)
-        if rn == 57:
-            if not safe_zone:
-                self.shoot()
+
 
         # self.checkOutOfBounds()
         self.image = self.make_image(self.enemyImage)

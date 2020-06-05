@@ -181,10 +181,10 @@ class Game(object):
         """Check for state switch and update state if needed"""
         if pg.mixer.music.get_pos()//1000 >= self.music_end:
             print(pg.mixer.music.get_pos()//1000)
-            # self.music_index = random.randint(0, 11)
-            # self.music_start = self.music_pos[self.music_index]
-            # self.music_end = self.music_pos[self.music_index + 1]
-            # pg.mixer.music.play(start=self.music_start)
+            self.music_index = random.randint(0, 11)
+            self.music_start = self.music_pos[self.music_index]
+            self.music_end = self.music_pos[self.music_index + 1]
+            pg.mixer.music.play(start=self.music_start)
         if self.state.quit:
             self.done = True
         elif self.state.done:

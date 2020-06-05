@@ -139,11 +139,11 @@ class Game(object):
         self.state_name = start_state
         self.state = self.states[self.state_name]
 
-        self.music_start_pos = [0, 149, 358, 610, 928,
-                                1197, 1389, 1606, 1775, 1900, 2277, 2488]
+        self.music_pos = [0, 149, 358, 610, 928,
+                          1197, 1389, 1606, 1775, 1900, 2277, 2488, 2670]
         self.music_index = random.randint(0, 11)
-        self.music_start = self.music_start_pos[self.music_index]
-        self.music_end = self.music_start_pos[self.music_index + 1]
+        self.music_start = self.music_pos[self.music_index]
+        self.music_end = self.music_pos[self.music_index + 1]
         self.game_music("music.ogg")
 
     def game_music(self, filename):
@@ -179,11 +179,12 @@ class Game(object):
 
     def update(self, dt):
         """Check for state switch and update state if needed"""
-        if pg.mixer.music.get_pos() >= self.music_end:
-            self.music_index = random.randint(0, 11)
-            self.music_start = self.music_start_pos[self.music_index]
-            self.music_end = self.music_start_pos[self.music_index + 1]
-            pg.mixer.music.play(start=self.music_start)
+        if pg.mixer.music.get_pos()//1000 >= self.music_end:
+            print(pg.mixer.music.get_pos()//1000)
+            # self.music_index = random.randint(0, 11)
+            # self.music_start = self.music_pos[self.music_index]
+            # self.music_end = self.music_pos[self.music_index + 1]
+            # pg.mixer.music.play(start=self.music_start)
         if self.state.quit:
             self.done = True
         elif self.state.done:

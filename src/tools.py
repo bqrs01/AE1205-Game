@@ -1,30 +1,54 @@
 """
  File: tools.py
  Authors: Mario Padrón Tardáguila & Bryan Quadras
- 
+
  Copyright (c) 2020 Mario Padrón Tardáguila & Bryan Quadras
- 
+
  The MIT License
- 
- Permission is hereby granted, free of charge, to any person obtaining a copy of this software 
+
+ Permission is hereby granted, free of charge, to any person obtaining a copy of this software
  and associated documentation files (the "Software"), to deal in the Software without restriction,
- including without limitation the rights to use, copy, modify, merge, publish, distribute, 
- sublicense, and/or sell copies of the Software, and to permit persons to whom the Software 
+ including without limitation the rights to use, copy, modify, merge, publish, distribute,
+ sublicense, and/or sell copies of the Software, and to permit persons to whom the Software
  is furnished to do so, subject to the following conditions:
- 
- The above copyright notice and this permission notice shall be included in all copies 
+
+ The above copyright notice and this permission notice shall be included in all copies
  or substantial portions of the Software.
- 
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
- INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR 
- PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE 
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+ INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+ PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
  FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
  ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
 import sys
+import os
+import io
 import pygame as pg
 import math
+
+
+class SoundManager:
+    def __init__(self):
+        pg.mixer.init()
+        self.sounds = []
+
+    def playSound(self, filename, duration, volume=0.5):
+        # print(pg.mixer.get_init())
+        # soundfile = io.BufferedReader(open(os.path.join(
+        #     os.getcwd(), f"src/soundeffects/{filename}"), "rb", buffering=0))
+        sound = pg.mixer.Sound(file=(os.path.join(
+            os.getcwd(), f"src/soundeffects/{filename}")))
+        sound.set_volume(volume)
+        sound.play(maxtime=duration)
+        self.sounds.append({"name": filename, "sound": sound})
+
+    def stopSound(self, filename):
+        for soundData in self.sounds:
+            if soundData.name == filename:
+                soundData["sound"].stop()
+                self.sounds.remove(soundData)
 
 
 class Vector:
@@ -228,9 +252,9 @@ def rotateImage(surf, image, pos, originPos, angle):
 
     box_rotate = [p.rotate(angle) for p in box]
     min_box = (min(box_rotate, key=lambda p: p[0])[
-               0], min(box_rotate, key=lambda p: p[1])[1])
+        0], min(box_rotate, key=lambda p: p[1])[1])
     max_box = (max(box_rotate, key=lambda p: p[0])[
-               0], max(box_rotate, key=lambda p: p[1])[1])
+        0], max(box_rotate, key=lambda p: p[1])[1])
 
     # calculate the translation of the pivot
     pivot = pg.math.Vector2(originPos[0], -originPos[1])

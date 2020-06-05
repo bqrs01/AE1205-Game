@@ -110,6 +110,7 @@ class GamePlay(tools.State):
         self.explosionManager = explosion.ExplosionManager()
         self.player = player.Player(
             self.bulletManager, self.statsManager, self.explosionManager)
+        self.soundManager = tools.SoundManager()
         # Generate one enemy at start of game.
         self.enemyManager.generate(1)
         self.isStart = True

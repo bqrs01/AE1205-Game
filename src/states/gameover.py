@@ -1,28 +1,29 @@
 """
  File: gameover.py
  Authors: Mario Padrón Tardáguila & Bryan Quadras
- 
+
  Copyright (c) 2020 Mario Padrón Tardáguila & Bryan Quadras
- 
+
  The MIT License
- 
- Permission is hereby granted, free of charge, to any person obtaining a copy of this software 
+
+ Permission is hereby granted, free of charge, to any person obtaining a copy of this software
  and associated documentation files (the "Software"), to deal in the Software without restriction,
- including without limitation the rights to use, copy, modify, merge, publish, distribute, 
- sublicense, and/or sell copies of the Software, and to permit persons to whom the Software 
+ including without limitation the rights to use, copy, modify, merge, publish, distribute,
+ sublicense, and/or sell copies of the Software, and to permit persons to whom the Software
  is furnished to do so, subject to the following conditions:
- 
- The above copyright notice and this permission notice shall be included in all copies 
+
+ The above copyright notice and this permission notice shall be included in all copies
  or substantial portions of the Software.
- 
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
- INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR 
- PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE 
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+ INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+ PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
  FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
  ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
 import sys
+import os
 import pygame as pg
 
 from .. import tools, prepare
@@ -36,20 +37,29 @@ class GameOver(tools.State):
         self.next_state = "SPLASH"
 
     def startup(self, game_data):
-        # Set title
-        self.title = self.font.render(
-            "Game Over!", True, pg.Color("dodgerblue"))
-        self.title_rect = self.title.get_rect(center=self.screen_rect.center)
+        self.soundManager = tools.SoundManager()
+
+        self.font_forte_med = pg.font.Font(os.path.join(
+            os.getcwd(), "src/fonts/FORTE.TTF"), 35)
+        self.font_forte_large = pg.font.Font(os.path.join(
+            os.getcwd(), "src/fonts/FORTE.TTF"), 50)
 
         self.game_surface = game_data['game_screen']
 
         self.dim_screen = pg.Surface(prepare.SCREEN_SIZE).convert_alpha()
         self.dim_screen.fill((0, 0, 0, 180))
 
-        self.subtitle = self.font.render(
+        # Set title
+        self.title = self.font_forte_large.render(
+            "Game Over!", True, pg.Color("dodgerblue"))
+        self.title_rect = self.title.get_rect(center=self.screen_rect.center)
+
+        self.subtitle = self.font_forte_med.render(
             f"You got a score of {game_data['final_score']}", True, pg.Color('darkgreen'))
         self.subtitle_rect = self.subtitle.get_rect(
-            center=(self.screen_rect.center[0], self.screen_rect.center[1] + 30))
+            center=(self.screen_rect.center[0], self.screen_rect.center[1] + 45))
+
+        self.soundManager.playSound('GameOver.mp3', duration=3000)
 
     def handle_event(self, event):
         if event.type == pg.QUIT:

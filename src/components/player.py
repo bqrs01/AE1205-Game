@@ -213,8 +213,16 @@ class Player(tools._BaseSprite):
                 self.sz_timer = False
                 print('safe zone off')
 
+        # else:
+        #     self.bullet_cooldown = 50
+
         if self.bullet_cooldown > 0:
             self.bullet_cooldown -= dt
+        else:
+            if self.statsManager.infinity:
+                self.shoot()
+                self.bullet_cooldown = 10
+                print('infinity shot')
 
         if not (self.old_pos == self.exact_pos):
             self.isMoving = True

@@ -1,5 +1,5 @@
 """
- File: __init__.py
+ File: main_screen.py
  Authors: Mario Padrón Tardáguila & Bryan Quadras
  
  Copyright (c) 2020 Mario Padrón Tardáguila & Bryan Quadras

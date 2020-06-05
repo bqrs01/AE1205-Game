@@ -82,8 +82,9 @@ class EnemyManager(pg.sprite.Group):
                 A_to_B.rotate_ip(180)
                 # reverse = tools.Vector(
                 #     30, tools.Vector.getReverseDirection(A_to_B))
-                A_to_B.scale_to_length(sprite.vel.magnitude())
-                sprite.pos += A_to_B
+                if sprite.vel.magnitude() != 0:
+                    A_to_B.scale_to_length(sprite.vel.magnitude())
+                    sprite.pos += A_to_B
 
     def generate(self, number=1):
         if len(self) <= 8:

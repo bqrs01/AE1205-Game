@@ -34,7 +34,7 @@ class GameOver(tools.State):
         # Call super to initialise everything needed
         super(GameOver, self).__init__()
         # Set next state
-        self.next_state = "SPLASH"
+        self.next_state = "MAINSCREEN"
 
     def startup(self, game_data):
         self.soundManager = tools.SoundManager()

@@ -30,17 +30,18 @@ import os
 import random
 from math import atan2, pi, sqrt, cos, sin
 from .. import prepare, tools
-from . import enemy
+from . import enemy, player
 
 BULLET_SIZE = (32, 32)
 CELL_SIZE = (46, 46)
 
 
 class BulletManager(pg.sprite.Group):
-    def __init__(self):
+    def __init__(self, soundManager):
         super(BulletManager, self).__init__()
         # self.enemy_objects = []
         self.bulletImages = {}
+        self.soundManager = soundManager
 
     def load_image(self, colour):
         if colour in self.bulletImages.keys():
@@ -98,6 +99,8 @@ class BulletManager(pg.sprite.Group):
     def new(self, owner, colour):
         image = self.load_image(colour)
         self.add(Bullet(owner, image))
+        if type(owner) == player.Player:
+            self.soundManager.playSound('laser.wav', volume=0.20, duration=225)
 
     def draw(self, surface):
         for bullet in self.sprites():

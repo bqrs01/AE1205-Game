@@ -85,12 +85,12 @@ class GamePlay(tools.State):
         if event.type == pg.QUIT:
             self.quit = True
         elif event.type == pg.KEYDOWN:
-            if event.key == pg.K_ESCAPE:
-                self.next_state = "GAMEOVER"
-                self.game_data['final_score'] = self.statsManager.score
-                self.game_data['game_screen'] = self.surface
-                self.done = True
-            elif event.key == pg.K_p:
+            # if event.key == pg.K_ESCAPE:
+            # self.next_state = "GAMEOVER"
+            # self.game_data['final_score'] = self.statsManager.score
+            # self.game_data['game_screen'] = self.surface
+            # self.done = True
+            if event.key == pg.K_p:
                 self.isPaused = not self.isPaused
             else:
                 self.player.add_direction(event.key)
@@ -105,12 +105,12 @@ class GamePlay(tools.State):
         """Startup function that sets up all game constructs."""
         self.game_data = game_data
         self.statsManager = StatsManager()
-        self.bulletManager = bullet.BulletManager()
+        self.soundManager = tools.SoundManager()
+        self.bulletManager = bullet.BulletManager(self.soundManager)
         self.enemyManager = enemy.EnemyManager(self.bulletManager)
         self.explosionManager = explosion.ExplosionManager()
         self.player = player.Player(
             self.bulletManager, self.statsManager, self.explosionManager)
-        self.soundManager = tools.SoundManager()
         # Generate one enemy at start of game.
         self.enemyManager.generate(1)
         self.isStart = True

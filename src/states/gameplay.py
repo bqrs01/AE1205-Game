@@ -49,13 +49,14 @@ class GamePlay(tools.State):
             os.getcwd(), "src/fonts/FORTE.TTF"), 25)
         self.infobar = pg.Surface((150, 95))
         self.infobar_rect = self.infobar.get_rect(topleft=(10, 10))
+
         # Initialise score message text surface.
         self.score_message = self.sub_font.render(
             "Score: 0.0", True, pg.Color('black'))
         self.score_message_rect = self.score_message.get_rect(topleft=(5, 10))
         # Initialise break message text surface and initialise onBreak, timer properties.
         self.break_message = self.sub_font.render(
-            "Cooldown", True, pg.Color('green'))
+            "Cooldown", True, pg.Color('red'))
         self.break_message_rect = self.score_message.get_rect(topleft=(5, 60))
         self.onBreak = False
         self.timer = 0
@@ -88,6 +89,7 @@ class GamePlay(tools.State):
 
     def render_infobar(self, surface):
         self.infobar.fill((0, 255, 255, 100))
+        self.infobar.set_alpha(100)
         self.infobar.blit(self.score_message, self.score_message_rect)
         if self.onBreak:
             self.infobar.blit(self.break_message, self.break_message_rect)

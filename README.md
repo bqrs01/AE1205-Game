@@ -1,1 +1,2 @@
-# AE1205-Game
+# Firecraze
+(AE1205 Competition)

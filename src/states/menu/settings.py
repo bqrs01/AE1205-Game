@@ -45,13 +45,27 @@ class SettingsScreen(tools.State):
             os.getcwd(), "src/images/Firecraze.png")).convert_alpha()
         self.logo.set_colorkey((0, 0, 0))
         self.logo_rect = self.logo.get_rect(
-            center=(prepare.SCREEN_CENTER[0], 110))
+            center=(prepare.SCREEN_CENTER[0], 280))
 
-        # self.sub_font = pg.font.Font(os.path.join(
-        #     os.getcwd(), "src/fonts/FORTE.TTF"), 35)
-        # self.go_back = self.sub_font.render(
-        #     "Press ESC to go back", True, pg.color.Color("green"))
-        # self.go_back_rect = self.go_back.get_rect(topleft=(85, 625))
+        self.sub_font = pg.font.Font(os.path.join(
+            os.getcwd(), "src/fonts/FORTE.TTF"), 50)
+        self.sub_font_2 = pg.font.Font(os.path.join(
+            os.getcwd(), "src/fonts/FORTE.TTF"), 35)
+
+        self.settings = self.sub_font.render(
+            "SETTINGS", True, pg.color.Color("green"))
+        self.settings_rect = self.settings.get_rect(
+            center=(prepare.SCREEN_CENTER[0], 240))
+
+        self.music_lbl = self.sub_font_2.render(
+            "MUSIC: ", True, pg.color.Color("yellow"))
+        self.music_lbl_rect = self.music_lbl.get_rect(
+            topleft=(400, 300))
+
+        self.sfx_lbl = self.sub_font_2.render(
+            "SFX: ", True, pg.color.Color("yellow"))
+        self.sfx_lbl_rect = self.sfx_lbl.get_rect(
+            topleft=(400, 370))
 
         self.focused_button = False
 
@@ -65,12 +79,30 @@ class SettingsScreen(tools.State):
             os.getcwd(), "src/images/arrowbutton_focused.png")).convert_alpha()
         # self.f_button = pg.transform.scale(self.f_button, self.button_size[i])
 
+        self.bgmusic = {}
+
+        # self.startup()
+
+    def startup(self, game_data):
         self.mousepos = (0, 0)
 
-        slider1 = tools.Slider(1.0, prepare.SCREEN_CENTER)
-        self.sliders = [slider1]
+        self.music_vol = self.bgmusic['get_volume']()
+
+        slider_music = tools.Slider(
+            self.music_vol, (600, 310), self.on_music_change)
+        slider_sfx = tools.Slider(1.0, (600, 380), self.on_sfx_change)
+
+        self.sliders = [slider_music, slider_sfx]
         self.focused_slider = -1
         self.isMouseDown = False
+
+    def on_music_change(self, new_value):
+        print("MUSIC", new_value)
+        #self.music_vol = new_value
+        self.bgmusic['set_volume'](new_value)
+
+    def on_sfx_change(self, new_value):
+        print("SFX", new_value)
 
     def draw_buttons(self, surface):
         if self.focused_button:
@@ -80,6 +112,8 @@ class SettingsScreen(tools.State):
 
     def button_selected(self):
         if self.focused_button:
+            # Saves volume
+            self.bgmusic['save_volume']()
             self.next_state = "MAINSCREEN"
             self.done = True
 
@@ -131,9 +165,11 @@ class SettingsScreen(tools.State):
 
     def draw(self, surface):
         surface.blit(self.image, self.rect)
-        self.draw_sliders(surface)
-        # surface.blit(self.go_back, self.go_back_rect)
+        surface.blit(self.settings, self.settings_rect)
+        surface.blit(self.music_lbl, self.music_lbl_rect)
+        surface.blit(self.sfx_lbl, self.sfx_lbl_rect)
         self.draw_buttons(surface)
+        self.draw_sliders(surface)
 
     def update(self, dt):
         self.check_if_button_focused()

@@ -29,6 +29,7 @@ import pygame as pg
 import math
 import random
 import threading
+import json
 
 song_names = [
     "Zane Alexander - D a y",
@@ -156,6 +157,11 @@ class Game(object):
         self.state_name = start_state
         self.state = self.states[self.state_name]
 
+        self.filenames = ['prefs.json']
+        self.setup_data()
+
+        self.music_vol = self.get_music_volume()
+
         self.music_pos = [0, 149, 358, 610, 928,
                           1197, 1389, 1606, 1775, 1900, 2277, 2488, 2670]
         self.music_index = random.randint(0, 11)
@@ -163,12 +169,39 @@ class Game(object):
         self.music_end = self.music_pos[self.music_index + 1]
         self.music_current_seek = self.music_start
         self.game_music("music.ogg")
+        # Get it from file..
+
+    def setup_data(self):
+        basedir = os.path.dirname(os.path.join(os.getcwd(), f"src/data/"))
+        if not os.path.exists(basedir):
+            os.makedirs(basedir)
+        for filename in self.filenames:
+            path = os.path.join(os.getcwd(), f"src/data/{filename}")
+            exists = os.path.exists(path)
+            if not exists:
+                f = open(path, 'a')
+                f.write('{}')
+                f.close()
+
+    def get_data(self, filename):
+        try:
+            with open(os.path.join(os.getcwd(), f"src/data/{filename}"), "r") as dataFile:
+                return json.load(dataFile)
+        except Exception as e:
+            print(e)
+
+    def set_data(self, filename, object):
+        try:
+            with open(os.path.join(os.getcwd(), f"src/data/{filename}"), "w") as dataFile:
+                json.dump(object, dataFile)
+        except Exception as e:
+            print(e)
 
     def game_music(self, filename):
         # Game music
         pg.mixer.music.load(os.path.join(
             os.getcwd(), f"src/soundeffects/{filename}"))
-        pg.mixer.music.set_volume(0.08)
+        pg.mixer.music.set_volume(self.music_vol)
         pg.mixer.music.play(start=self.music_start)
         self.state.bgmusic = {
             "song_name": song_names[self.music_index], "pause_music": self.pause_music}
@@ -177,8 +210,21 @@ class Game(object):
         pg.mixer.music.pause()
         threading.Timer(duration, pg.mixer.music.unpause).start()
 
-    # def resume_music(self):
-    #     pg.mixer.music.play(start=)
+    def get_music_volume(self):
+        data = self.get_data('prefs.json')
+        if not "music_volume" in data:
+            data['music_volume'] = 0.08
+            self.set_data('prefs.json', data)
+        return (data['music_volume'])
+
+    def set_music_volume(self, newVolume):
+        self.music_vol = newVolume
+        pg.mixer.music.set_volume(self.music_vol)
+
+    def save_music_volume(self):
+        data = self.get_data('prefs.json')
+        data['music_volume'] = self.music_vol
+        self.set_data('prefs.json', data)
 
     def event_loop(self):
         """Events are passed to current state"""
@@ -196,7 +242,7 @@ class Game(object):
         game_data = self.state.game_data  # Persistent data
         self.state = self.states[self.state_name]
         self.state.bgmusic = {
-            "song_name": song_names[self.music_index], "pause_music": self.pause_music}
+            "song_name": song_names[self.music_index], "pause_music": self.pause_music, "get_volume": self.get_music_volume, "set_volume": self.set_music_volume, "save_volume": self.save_music_volume}
         self.state.startup(game_data)
 
     def toggle_show_fps(self, key):
@@ -323,17 +369,18 @@ def rotateImage(surf, image, pos, originPos, angle):
 
 
 class Slider(_BaseSprite):
-    def __init__(self, starting_value, position):
+    def __init__(self, starting_value, position, when_update):
         super().__init__(position, (300, 50))
         self.value = starting_value
         self.position = position
+        self.when_update = when_update
 
         self.max = 200
 
         self.setup()
 
     def setup(self):
-        self.image = pg.Surface((300, 50), pg.SRCALPHA).convert_alpha()
+        self.image = pg.Surface((204, 20), pg.SRCALPHA).convert_alpha()
         # self.image.fill((255, 255, 0))
         # self.image.set_colorkey((255, 255, 0))
 
@@ -354,7 +401,8 @@ class Slider(_BaseSprite):
         posx = max(posx, 0)
 
         self.value = (posx/self.max)
-        print(self.value)
+
+        self.when_update(self.value)
 
     def handle_mouse(self, pos):
         self.set_value(pos[0] - self.rect.x)

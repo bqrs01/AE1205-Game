@@ -39,7 +39,8 @@ def main():
         "GAMEPLAY": gameplay.GamePlay(),
         "GAMEOVER": gameover.GameOver(),
         "MAINSCREEN": main_screen.MainScreen(),
-        "CONTROLS": controls_screen.ControlsScreen()}
+        "CONTROLS": controls_screen.ControlsScreen(),
+        "SETTINGS": settings.SettingsScreen()}
 
     game = tools.Game(screen, caption, states, "SPLASH")
     game.run()

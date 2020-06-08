@@ -37,7 +37,7 @@ class GameOver(tools.State):
         self.next_state = "MAINSCREEN"
 
     def startup(self, game_data):
-        self.soundManager = tools.SoundManager()
+        self.soundManager = tools.SoundManager('prefs.json')
 
         self.font_forte_med = pg.font.Font(os.path.join(
             os.getcwd(), "src/fonts/FORTE.TTF"), 35)

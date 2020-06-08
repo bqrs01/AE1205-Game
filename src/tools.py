@@ -327,20 +327,34 @@ class Slider(_BaseSprite):
         super().__init__(position, (300, 50))
         self.value = starting_value
         self.position = position
+
+        self.max = 200
+
         self.setup()
 
     def setup(self):
-        #self.image = pg.Surface((300, 50), pg.SRCALPHA).convert_alpha()
-        self.rect = self.image.get_rect(topleft=self.position)
+        self.image = pg.Surface((300, 50), pg.SRCALPHA).convert_alpha()
         # self.image.fill((255, 255, 0))
         # self.image.set_colorkey((255, 255, 0))
 
-        # self.outerRect = pg.Surface((200, 25))
+        # Outer rect
         pg.draw.rect(self.image, pg.color.Color(
-            'green'), (*self.position, 200, 20), True)
+            'yellow'), (0, 0, 204, 20), True)
+
+        # Inner rect
+        val = 200 * self.value
+        pg.draw.rect(self.image, pg.color.Color('red'), (2, 2, val, 16))
 
     def draw(self, surface):
+        self.setup()
         surface.blit(self.image, self.rect)
 
-    def handle_event(self, event):
-        pass
+    def set_value(self, posx):
+        posx = min(posx, self.max)
+        posx = max(posx, 0)
+
+        self.value = (posx/self.max)
+        print(self.value)
+
+    def handle_mouse(self, pos):
+        self.set_value(pos[0] - self.rect.x)

@@ -67,7 +67,10 @@ class SettingsScreen(tools.State):
 
         self.mousepos = (0, 0)
 
-        self.slider1 = tools.Slider(0.5, prepare.SCREEN_CENTER)
+        slider1 = tools.Slider(1.0, prepare.SCREEN_CENTER)
+        self.sliders = [slider1]
+        self.focused_slider = -1
+        self.isMouseDown = False
 
     def draw_buttons(self, surface):
         if self.focused_button:
@@ -80,7 +83,7 @@ class SettingsScreen(tools.State):
             self.next_state = "MAINSCREEN"
             self.done = True
 
-    def check_if_focused(self):
+    def check_if_button_focused(self):
         x = self.mousepos[0]
         y = self.mousepos[1]
         button_rect = self.button_rect
@@ -90,21 +93,48 @@ class SettingsScreen(tools.State):
         else:
             self.focused_button = False
 
+    def check_if_sliders_focused(self):
+        focus_happened = False
+        for idx, slider in enumerate(self.sliders):
+            x = self.mousepos[0]
+            y = self.mousepos[1]
+            if slider.rect.collidepoint(x, y):
+                self.focused_slider = idx
+                focus_happened = True
+                break
+        if not focus_happened:
+            self.focused_slider = -1
+
+    def slider_selected(self):
+        if self.focused_slider != -1 and self.isMouseDown:
+            self.sliders[self.focused_slider].handle_mouse(self.mousepos)
+
     def handle_event(self, event):
         if event.type == pg.QUIT:
             self.quit = True
+        elif event.type == pg.MOUSEBUTTONDOWN:
+            self.isMouseDown = True
+            self.slider_selected()
+            pass
         elif event.type == pg.MOUSEBUTTONUP:
             self.button_selected()
+            self.isMouseDown = False
             # if event.key == pg.K_ESCAPE:
             #     self.done = True
         elif event.type == pg.MOUSEMOTION:
             self.mousepos = event.pos
+            self.slider_selected()
+
+    def draw_sliders(self, surface):
+        for slider in self.sliders:
+            slider.draw(surface)
 
     def draw(self, surface):
         surface.blit(self.image, self.rect)
-        self.slider1.draw(surface)
+        self.draw_sliders(surface)
         # surface.blit(self.go_back, self.go_back_rect)
         self.draw_buttons(surface)
 
     def update(self, dt):
-        self.check_if_focused()
+        self.check_if_button_focused()
+        self.check_if_sliders_focused()

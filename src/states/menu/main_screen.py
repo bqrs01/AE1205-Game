@@ -39,10 +39,7 @@ class MainScreen(tools.State):
         self.image = pg.image.load(os.path.join(
             os.getcwd(), "src/images/mainscreenbg.png")).convert()
         self.rect = self.image.get_rect(center=prepare.SCREEN_CENTER)
-        self.frame_num = 0
-        self.last_update = pg.time.get_ticks()
-        self.frame_rate = 70
-        self.loading = True
+
         # Set next state
         self.next_state = "GAMEPLAY"
 

@@ -35,8 +35,8 @@ class SettingsScreen(tools.State):
         super(SettingsScreen, self).__init__()
         # self.images = []
         # self.gen_images()
-        self.image = pg.Surface(prepare.SCREEN_SIZE)
-        self.image.fill(pg.color.Color('blue'))
+        self.image = pg.image.load(os.path.join(
+            os.getcwd(), "src/images/mainscreenbg.png")).convert()
         self.rect = self.image.get_rect(center=prepare.SCREEN_CENTER)
         # Set next state
         self.next_state = "MAINSCREEN"
@@ -47,21 +47,64 @@ class SettingsScreen(tools.State):
         self.logo_rect = self.logo.get_rect(
             center=(prepare.SCREEN_CENTER[0], 110))
 
-        self.sub_font = pg.font.Font(os.path.join(
-            os.getcwd(), "src/fonts/FORTE.TTF"), 35)
-        self.go_back = self.sub_font.render(
-            "Press ESC to go back", True, pg.color.Color("green"))
-        self.go_back_rect = self.go_back.get_rect(topleft=(85, 625))
+        # self.sub_font = pg.font.Font(os.path.join(
+        #     os.getcwd(), "src/fonts/FORTE.TTF"), 35)
+        # self.go_back = self.sub_font.render(
+        #     "Press ESC to go back", True, pg.color.Color("green"))
+        # self.go_back_rect = self.go_back.get_rect(topleft=(85, 625))
+
+        self.focused_button = False
+
+        self.button = pg.image.load(os.path.join(
+            os.getcwd(), "src/images/arrowbutton_unfocused.png")).convert_alpha()
+        # self.button = pg.transform.scale(button, (40, 20))
+        self.button_rect = self.button.get_rect(
+            center=(40, 40))
+
+        self.f_button = pg.image.load(os.path.join(
+            os.getcwd(), "src/images/arrowbutton_focused.png")).convert_alpha()
+        # self.f_button = pg.transform.scale(self.f_button, self.button_size[i])
+
+        self.mousepos = (0, 0)
+
+        self.slider1 = tools.Slider(0.5, prepare.SCREEN_CENTER)
+
+    def draw_buttons(self, surface):
+        if self.focused_button:
+            surface.blit(self.f_button, self.button_rect)
+        else:
+            surface.blit(self.button, self.button_rect)
+
+    def button_selected(self):
+        if self.focused_button:
+            self.next_state = "MAINSCREEN"
+            self.done = True
+
+    def check_if_focused(self):
+        x = self.mousepos[0]
+        y = self.mousepos[1]
+        button_rect = self.button_rect
+        if button_rect.collidepoint(x, y):
+            # Button is focused.
+            self.focused_button = True
+        else:
+            self.focused_button = False
 
     def handle_event(self, event):
         if event.type == pg.QUIT:
             self.quit = True
-        elif event.type == pg.KEYDOWN:
-            if event.key == pg.K_ESCAPE:
-                self.done = True
+        elif event.type == pg.MOUSEBUTTONUP:
+            self.button_selected()
+            # if event.key == pg.K_ESCAPE:
+            #     self.done = True
         elif event.type == pg.MOUSEMOTION:
             self.mousepos = event.pos
 
     def draw(self, surface):
         surface.blit(self.image, self.rect)
-        surface.blit(self.go_back, self.go_back_rect)
+        self.slider1.draw(surface)
+        # surface.blit(self.go_back, self.go_back_rect)
+        self.draw_buttons(surface)
+
+    def update(self, dt):
+        self.check_if_focused()

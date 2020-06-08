@@ -320,3 +320,27 @@ def rotateImage(surf, image, pos, originPos, angle):
     rotated_image = pg.transform.rotate(image, angle)
 
     return rotated_image, origin
+
+
+class Slider(_BaseSprite):
+    def __init__(self, starting_value, position):
+        super().__init__(position, (300, 50))
+        self.value = starting_value
+        self.position = position
+        self.setup()
+
+    def setup(self):
+        #self.image = pg.Surface((300, 50), pg.SRCALPHA).convert_alpha()
+        self.rect = self.image.get_rect(topleft=self.position)
+        # self.image.fill((255, 255, 0))
+        # self.image.set_colorkey((255, 255, 0))
+
+        # self.outerRect = pg.Surface((200, 25))
+        pg.draw.rect(self.image, pg.color.Color(
+            'green'), (*self.position, 200, 20), True)
+
+    def draw(self, surface):
+        surface.blit(self.image, self.rect)
+
+    def handle_event(self, event):
+        pass

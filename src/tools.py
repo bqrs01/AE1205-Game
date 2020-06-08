@@ -277,6 +277,11 @@ class Game(object):
     def set_sfx_volume(self, newVolume):
         self.sfx_vol = newVolume
 
+    def get_min_and_secs(self, time_s):
+        mins = time_s // 60
+        secs = time_s % 60
+        return (mins, secs)
+
     def save_music_volume(self):
         data = self.get_data('prefs.json')
         data['music_volume'] = self.music_vol
@@ -306,7 +311,8 @@ class Game(object):
             "song_name": song_names[self.music_index], "pause_music": self.pause_music,
             "get_volume": self.get_music_volume, "set_volume": self.set_music_volume,
             "save_volume": self.save_music_volume, "get_sfx_volume": self.get_sfx_volume,
-            "set_sfx_volume": self.set_sfx_volume}
+            "set_sfx_volume": self.set_sfx_volume, "current_position": self.get_min_and_secs(self.music_current_seek),
+            "song_length": self.get_min_and_secs(self.music_end-self.music_start)}
 
     def toggle_show_fps(self, key):
         """Press f5 to turn on/off displaying the framerate in the caption."""
@@ -318,11 +324,16 @@ class Game(object):
     def update(self, dt):
         """Check for state switch and update state if needed"""
         self.music_current_seek = pg.mixer.music.get_pos()//1000
+        self.state.bgmusic["current_position"] = self.get_min_and_secs(
+            self.music_current_seek)
         if self.music_current_seek >= (self.music_end - self.music_start):
             self.music_index = random.randint(0, 11)
             self.music_start = self.music_pos[self.music_index]
             self.music_end = self.music_pos[self.music_index + 1]
             self.state.bgmusic["song_name"] = song_names[self.music_index]
+            self.state.bgmusic["current_position"] = (0, 0)
+            self.state.bgmusic["song_length"] = self.get_min_and_secs(
+                self.music_end-self.music_start)
             print(song_names[self.music_index])
             pg.mixer.music.play(start=self.music_start)
         if self.state.quit:

@@ -73,13 +73,13 @@ class GamePlay(tools.State):
 
         # PAUSED SCREEN
         self.paused_font = pg.font.Font(os.path.join(
-            os.getcwd(), "src/fonts/FORTE.TTF"), 50)
+            os.getcwd(), "src/fonts/FORTE.TTF"), 60)
         self.paused_font_sub = pg.font.Font(os.path.join(
             os.getcwd(), "src/fonts/FORTE.TTF"), 35)
         self.paused_message = self.paused_font.render(
             "Paused", True, pg.Color('green'))
         self.paused_message_rect = self.paused_message.get_rect(
-            center=(prepare.SCREEN_CENTER[0], prepare.SCREEN_CENTER[1]-35))
+            center=(prepare.SCREEN_CENTER[0], prepare.SCREEN_CENTER[1]-40))
         # self.paused_message_subtitle = self.paused_font_sub.render(
         #     "Press ESC to start playing", True, pg.Color('red'))
         # self.paused_message_subtitle_rect = self.paused_message_subtitle.get_rect(

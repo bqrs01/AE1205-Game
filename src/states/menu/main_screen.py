@@ -140,8 +140,12 @@ class MainScreen(tools.State):
             self.focused_button = -1
 
     def update(self, dt):
+        mins_crnt = str(self.bgmusic['current_position'][0]).zfill(2)
+        secs_crnt = str(self.bgmusic['current_position'][1]).zfill(2)
+        mins_song = str(self.bgmusic['song_length'][0]).zfill(2)
+        secs_song = str(self.bgmusic['song_length'][1]).zfill(2)
         self.current_song = self.sub_font_2.render(
-            f"Song: {self.bgmusic['song_name']}", True, pg.color.Color('green'))
+            f"Song: {self.bgmusic['song_name']} [{mins_crnt}:{secs_crnt}/{mins_song}:{secs_song}]", True, pg.color.Color('green'))
         self.current_song_rect = self.current_song.get_rect(
             center=(600, 665))
         self.check_if_focused()

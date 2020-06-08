@@ -59,7 +59,7 @@ class GameOver(tools.State):
         self.subtitle_rect = self.subtitle.get_rect(
             center=(self.screen_rect.center[0], self.screen_rect.center[1] + 45))
 
-        self.soundManager.playSound('GameOver.mp3', duration=3000, volume=0.25)
+        self.soundManager.playSound('GameOver.mp3', duration=3000)
 
     def handle_event(self, event):
         if event.type == pg.QUIT:

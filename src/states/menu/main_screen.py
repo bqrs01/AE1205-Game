@@ -122,6 +122,8 @@ class MainScreen(tools.State):
             f"Song: {self.bgmusic['song_name']}", True, pg.color.Color('green'))
         self.current_song_rect = self.current_song.get_rect(
             center=(600, 665))
+        self.focused_button = -1
+        self.mousepos = (0, 0)
 
     def check_if_focused(self):
         focus_happened = False
@@ -140,6 +142,8 @@ class MainScreen(tools.State):
     def update(self, dt):
         self.current_song = self.sub_font_2.render(
             f"Song: {self.bgmusic['song_name']}", True, pg.color.Color('green'))
+        self.current_song_rect = self.current_song.get_rect(
+            center=(600, 665))
         self.check_if_focused()
 
     def draw(self, surface):

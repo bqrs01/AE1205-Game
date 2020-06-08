@@ -63,14 +63,14 @@ class SoundManager:
             self.set_data('prefs.json', data)
         return (data['sfx_volume'])
 
-    def setup_data(self):
+    def setup_data(self, force=False):
         basedir = os.path.dirname(os.path.join(os.getcwd(), f"src/data/"))
         if not os.path.exists(basedir):
             os.makedirs(basedir)
         for filename in self.filenames:
             path = os.path.join(os.getcwd(), f"src/data/{filename}")
             exists = os.path.exists(path)
-            if not exists:
+            if not exists or force:
                 f = open(path, 'a')
                 f.write('{}')
                 f.close()
@@ -79,15 +79,17 @@ class SoundManager:
         try:
             with open(os.path.join(os.getcwd(), f"src/data/{filename}"), "r") as dataFile:
                 return json.load(dataFile)
-        except Exception as e:
-            print(e)
+        except (TypeError, json.JSONDecodeError):
+            self.setup_data(force=True)
+            return self.get_data(filename)
 
     def set_data(self, filename, object):
         try:
             with open(os.path.join(os.getcwd(), f"src/data/{filename}"), "w") as dataFile:
                 json.dump(object, dataFile)
-        except Exception as e:
-            print(e)
+        except (TypeError, json.JSONDecodeError):
+            self.setup_data(force=True)
+            return self.set_data(filename, object)
 
     def playSound(self, filename, duration):
         # print(pg.mixer.get_init())
@@ -208,14 +210,14 @@ class Game(object):
         self.game_music("music.ogg")
         # Get it from file..
 
-    def setup_data(self):
+    def setup_data(self, force=False):
         basedir = os.path.dirname(os.path.join(os.getcwd(), f"src/data/"))
         if not os.path.exists(basedir):
             os.makedirs(basedir)
         for filename in self.filenames:
             path = os.path.join(os.getcwd(), f"src/data/{filename}")
             exists = os.path.exists(path)
-            if not exists:
+            if not exists or force:
                 f = open(path, 'a')
                 f.write('{}')
                 f.close()
@@ -224,15 +226,17 @@ class Game(object):
         try:
             with open(os.path.join(os.getcwd(), f"src/data/{filename}"), "r") as dataFile:
                 return json.load(dataFile)
-        except Exception as e:
-            print(e)
+        except (TypeError, json.JSONDecodeError):
+            self.setup_data(force=True)
+            return self.get_data(filename)
 
-    def set_data(self, filename, object):
+    def set_data(self, filename, objectVar):
         try:
             with open(os.path.join(os.getcwd(), f"src/data/{filename}"), "w") as dataFile:
-                json.dump(object, dataFile)
-        except Exception as e:
-            print(e)
+                json.dump(objectVar, dataFile)
+        except (TypeError, json.JSONDecodeError):
+            self.setup_data(force=True)
+            return self.set_data(filename, objectVar)
 
     def game_music(self, filename):
         # Game music
@@ -248,10 +252,13 @@ class Game(object):
 
     def get_music_volume(self):
         data = self.get_data('prefs.json')
-        if not "music_volume" in data:
-            data['music_volume'] = 0.08
-            self.set_data('prefs.json', data)
-        return (data['music_volume'])
+        try:
+            if not "music_volume" in data:
+                data['music_volume'] = 0.08
+                self.set_data('prefs.json', data)
+            return (data['music_volume'])
+        except TypeError:
+            self.setup_data(force=True)
 
     def set_music_volume(self, newVolume):
         self.music_vol = newVolume
@@ -259,10 +266,13 @@ class Game(object):
 
     def get_sfx_volume(self):
         data = self.get_data('prefs.json')
-        if not "sfx_volume" in data:
-            data['sfx_volume'] = 0.2
-            self.set_data('prefs.json', data)
-        return (data['sfx_volume'])
+        try:
+            if not "sfx_volume" in data:
+                data['sfx_volume'] = 0.2
+                self.set_data('prefs.json', data)
+            return (data['sfx_volume'])
+        except TypeError:
+            self.setup_data(force=True)
 
     def set_sfx_volume(self, newVolume):
         self.sfx_vol = newVolume
@@ -307,12 +317,13 @@ class Game(object):
 
     def update(self, dt):
         """Check for state switch and update state if needed"""
-        self.music_current_seek = pg.mixer.music.get_pos()/1000
-        if pg.mixer.music.get_pos()//1000 >= self.music_end:
+        self.music_current_seek = pg.mixer.music.get_pos()//1000
+        if self.music_current_seek >= (self.music_end - self.music_start):
             self.music_index = random.randint(0, 11)
             self.music_start = self.music_pos[self.music_index]
             self.music_end = self.music_pos[self.music_index + 1]
             self.state.bgmusic["song_name"] = song_names[self.music_index]
+            print(song_names[self.music_index])
             pg.mixer.music.play(start=self.music_start)
         if self.state.quit:
             self.done = True

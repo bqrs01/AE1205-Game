@@ -69,6 +69,7 @@ class GamePlay(tools.State):
 
         # Initialise property isPaused to False.
         self.isPaused = False
+        self.isEnd = False
 
         # PAUSED SCREEN
         self.paused_font = pg.font.Font(os.path.join(
@@ -78,13 +79,26 @@ class GamePlay(tools.State):
         self.paused_message = self.paused_font.render(
             "Paused", True, pg.Color('green'))
         self.paused_message_rect = self.paused_message.get_rect(
-            center=prepare.SCREEN_CENTER)
-        self.paused_message_subtitle = self.paused_font_sub.render(
-            "Press ESC to start playing", True, pg.Color('red'))
-        self.paused_message_subtitle_rect = self.paused_message_subtitle.get_rect(
-            center=(prepare.SCREEN_CENTER[0], prepare.SCREEN_CENTER[1]+50))
+            center=(prepare.SCREEN_CENTER[0], prepare.SCREEN_CENTER[1]-35))
+        # self.paused_message_subtitle = self.paused_font_sub.render(
+        #     "Press ESC to start playing", True, pg.Color('red'))
+        # self.paused_message_subtitle_rect = self.paused_message_subtitle.get_rect(
+        #     center=(prepare.SCREEN_CENTER[0], prepare.SCREEN_CENTER[1]+50))
         self.dim_screen = pg.Surface(prepare.SCREEN_SIZE).convert_alpha()
         self.dim_screen.fill((0, 0, 0, 180))
+
+        self.button_names = ["resumebutton", "menubutton"]
+        self.button_pos = [380, 450]
+        self.button_size = [(180, 54), (180, 54)]
+        self.button_states = ["NONE", "MAINSCREEN"]
+        self.buttons = []
+        self.buttons_focused = []
+        self.buttons_rects = []
+        self.focused_button = -1
+
+        self.mousepos = (0, 0)
+
+        self.get_button_images()
 
         # START SCREEN
         self.isStart = False
@@ -110,6 +124,49 @@ class GamePlay(tools.State):
         self.draw_health(self.statsManager.health, self.infobar)
         surface.blit(self.infobar, self.infobar_rect)
 
+    def get_button_images(self):
+        for i, name in enumerate(self.button_names):
+            button = pg.image.load(os.path.join(
+                os.getcwd(), f"src/images/{name}_unfocused.png")).convert_alpha()
+            button = pg.transform.scale(button, self.button_size[i])
+            button_rect = button.get_rect(
+                center=(prepare.SCREEN_CENTER[0], self.button_pos[i]))
+            self.buttons.append(button)
+            self.buttons_rects.append(button_rect)
+
+            f_button = pg.image.load(os.path.join(
+                os.getcwd(), f"src/images/{name}_focused.png")).convert_alpha()
+            f_button = pg.transform.scale(f_button, self.button_size[i])
+            self.buttons_focused.append(f_button)
+
+    def draw_buttons(self, surface):
+        for i, button in enumerate(self.buttons):
+            if self.focused_button == i:
+                surface.blit(self.buttons_focused[i], self.buttons_rects[i])
+            else:
+                surface.blit(button, self.buttons_rects[i])
+
+    def button_selected(self):
+        if self.focused_button != -1:
+            self.isPaused = False
+            if not self.button_states[self.focused_button] == "NONE":
+                self.next_state = self.button_states[self.focused_button]
+                self.done = True
+
+    def check_if_focused(self):
+        focus_happened = False
+        for idx in range(len(self.buttons)):
+            x = self.mousepos[0]
+            y = self.mousepos[1]
+            button_rect = self.buttons_rects[idx]
+            if button_rect.collidepoint(x, y):
+                # Button is focused.
+                self.focused_button = idx
+                focus_happened = True
+                break
+        if not focus_happened:
+            self.focused_button = -1
+
     def handle_event(self, event):
         """Function to handle pygame events."""
         if event.type == pg.QUIT:
@@ -124,6 +181,10 @@ class GamePlay(tools.State):
             self.player.pop_direction(event.key)
         elif event.type == pg.MOUSEMOTION:
             self.player.update_angle(event.pos)
+            self.mousepos = event.pos
+        elif event.type == pg.MOUSEBUTTONUP:
+            if self.isPaused:
+                self.button_selected()
         elif event.type == pg.MOUSEBUTTONDOWN:
             if not self.isPaused and not self.isStart and not self.statsManager.infinity:
                 self.player.shoot()
@@ -148,12 +209,15 @@ class GamePlay(tools.State):
             bottomleft=(15, 690))
         self.last_update = pg.time.get_ticks()
 
+        self.isEnd = False
+        self.isPaused = False
+
     def update(self, dt):
         """Update function to update sprite position and graphics."""
         if not self.statsManager.gameOver:
             if self.isPaused:
                 # Do not update game if paused
-                pass
+                self.check_if_focused()
             elif self.isStart:
                 now = pg.time.get_ticks()
                 if (now - self.last_update) > 3000:
@@ -189,6 +253,7 @@ class GamePlay(tools.State):
                         self.onBreak = False
         else:
             # Game over. Switch to next state.
+            self.isEnd = True
             self.next_state = "GAMEOVER"
             self.game_data['final_score'] = self.statsManager.score
             self.game_data['game_screen'] = self.surface
@@ -206,13 +271,15 @@ class GamePlay(tools.State):
 
         self.render_infobar(surface)
 
-        surface.blit(self.current_song, self.current_song_rect)
+        if not self.isEnd:
+            surface.blit(self.current_song, self.current_song_rect)
 
         if self.isPaused:
             surface.blit(self.dim_screen, (0, 0))
             surface.blit(self.paused_message, self.paused_message_rect)
-            surface.blit(self.paused_message_subtitle,
-                         self.paused_message_subtitle_rect)
+            # surface.blit(self.paused_message_subtitle,
+            #              self.paused_message_subtitle_rect)
+            self.draw_buttons(surface)
         if self.isStart:
             surface.blit(self.dim_screen, (0, 0))
             surface.blit(self.start_message, self.start_message_rect)

@@ -121,7 +121,7 @@ class GamePlay(tools.State):
         """Startup function that sets up all game constructs."""
         self.game_data = game_data
         self.statsManager = StatsManager()
-        self.soundManager = tools.SoundManager()
+        self.soundManager = tools.SoundManager('prefs.json')
         self.powerupManager = powerup.PowerupManager(self.statsManager)
         self.bulletManager = bullet.BulletManager(
             self.soundManager, self.powerupManager)

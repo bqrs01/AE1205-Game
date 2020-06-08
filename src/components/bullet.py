@@ -104,7 +104,7 @@ class BulletManager(pg.sprite.Group):
         image = self.load_image(colour)
         self.add(Bullet(owner, image))
         if type(owner) == player.Player:
-            self.soundManager.playSound('laser.wav', volume=0.14, duration=225)
+            self.soundManager.playSound('laser.wav', duration=225)
 
     def draw(self, surface):
         for bullet in self.sprites():

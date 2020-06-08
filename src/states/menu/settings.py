@@ -87,22 +87,24 @@ class SettingsScreen(tools.State):
         self.mousepos = (0, 0)
 
         self.music_vol = self.bgmusic['get_volume']()
+        self.sfx_vol = self.bgmusic['get_sfx_volume']()
 
         slider_music = tools.Slider(
             self.music_vol, (600, 310), self.on_music_change)
-        slider_sfx = tools.Slider(1.0, (600, 380), self.on_sfx_change)
+        slider_sfx = tools.Slider(self.sfx_vol, (600, 380), self.on_sfx_change)
 
         self.sliders = [slider_music, slider_sfx]
         self.focused_slider = -1
         self.isMouseDown = False
 
     def on_music_change(self, new_value):
-        print("MUSIC", new_value)
-        #self.music_vol = new_value
+        # print("MUSIC", new_value)
         self.bgmusic['set_volume'](new_value)
+        self.bgmusic['save_volume']()
 
     def on_sfx_change(self, new_value):
-        print("SFX", new_value)
+        self.bgmusic['set_sfx_volume'](new_value)
+        self.bgmusic['save_volume']()
 
     def draw_buttons(self, surface):
         if self.focused_button:

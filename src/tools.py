@@ -49,17 +49,53 @@ song_names = [
 
 
 class SoundManager:
-    def __init__(self):
+    def __init__(self, filename):
         pg.mixer.init()
         self.sounds = []
+        self.filenames = [filename]
+        self.setup_data()
+        self.volume = self.get_volume()
 
-    def playSound(self, filename, duration, volume=0.5):
+    def get_volume(self):
+        data = self.get_data(self.filenames[0])
+        if not "sfx_volume" in data:
+            data['sfx_volume'] = 0.5
+            self.set_data('prefs.json', data)
+        return (data['sfx_volume'])
+
+    def setup_data(self):
+        basedir = os.path.dirname(os.path.join(os.getcwd(), f"src/data/"))
+        if not os.path.exists(basedir):
+            os.makedirs(basedir)
+        for filename in self.filenames:
+            path = os.path.join(os.getcwd(), f"src/data/{filename}")
+            exists = os.path.exists(path)
+            if not exists:
+                f = open(path, 'a')
+                f.write('{}')
+                f.close()
+
+    def get_data(self, filename):
+        try:
+            with open(os.path.join(os.getcwd(), f"src/data/{filename}"), "r") as dataFile:
+                return json.load(dataFile)
+        except Exception as e:
+            print(e)
+
+    def set_data(self, filename, object):
+        try:
+            with open(os.path.join(os.getcwd(), f"src/data/{filename}"), "w") as dataFile:
+                json.dump(object, dataFile)
+        except Exception as e:
+            print(e)
+
+    def playSound(self, filename, duration):
         # print(pg.mixer.get_init())
         # soundfile = io.BufferedReader(open(os.path.join(
         #     os.getcwd(), f"src/soundeffects/{filename}"), "rb", buffering=0))
         sound = pg.mixer.Sound(file=(os.path.join(
             os.getcwd(), f"src/soundeffects/{filename}")))
-        sound.set_volume(volume)
+        sound.set_volume(self.volume)
         sound.play(maxtime=duration)
         self.sounds.append({"name": filename, "sound": sound})
 
@@ -161,6 +197,7 @@ class Game(object):
         self.setup_data()
 
         self.music_vol = self.get_music_volume()
+        self.sfx_vol = self.get_sfx_volume()
 
         self.music_pos = [0, 149, 358, 610, 928,
                           1197, 1389, 1606, 1775, 1900, 2277, 2488, 2670]
@@ -203,8 +240,7 @@ class Game(object):
             os.getcwd(), f"src/soundeffects/{filename}"))
         pg.mixer.music.set_volume(self.music_vol)
         pg.mixer.music.play(start=self.music_start)
-        self.state.bgmusic = {
-            "song_name": song_names[self.music_index], "pause_music": self.pause_music}
+        self.set_bgmusic()
 
     def pause_music(self, duration):
         pg.mixer.music.pause()
@@ -221,9 +257,20 @@ class Game(object):
         self.music_vol = newVolume
         pg.mixer.music.set_volume(self.music_vol)
 
+    def get_sfx_volume(self):
+        data = self.get_data('prefs.json')
+        if not "sfx_volume" in data:
+            data['sfx_volume'] = 0.2
+            self.set_data('prefs.json', data)
+        return (data['sfx_volume'])
+
+    def set_sfx_volume(self, newVolume):
+        self.sfx_vol = newVolume
+
     def save_music_volume(self):
         data = self.get_data('prefs.json')
         data['music_volume'] = self.music_vol
+        data['sfx_volume'] = self.sfx_vol
         self.set_data('prefs.json', data)
 
     def event_loop(self):
@@ -241,9 +288,15 @@ class Game(object):
         self.state_name = next_state
         game_data = self.state.game_data  # Persistent data
         self.state = self.states[self.state_name]
-        self.state.bgmusic = {
-            "song_name": song_names[self.music_index], "pause_music": self.pause_music, "get_volume": self.get_music_volume, "set_volume": self.set_music_volume, "save_volume": self.save_music_volume}
+        self.set_bgmusic()
         self.state.startup(game_data)
+
+    def set_bgmusic(self):
+        self.state.bgmusic = {
+            "song_name": song_names[self.music_index], "pause_music": self.pause_music,
+            "get_volume": self.get_music_volume, "set_volume": self.set_music_volume,
+            "save_volume": self.save_music_volume, "get_sfx_volume": self.get_sfx_volume,
+            "set_sfx_volume": self.set_sfx_volume}
 
     def toggle_show_fps(self, key):
         """Press f5 to turn on/off displaying the framerate in the caption."""

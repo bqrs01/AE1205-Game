@@ -177,6 +177,7 @@ class Player(tools._BaseSprite):
             self.statsManager.addScore(5)
         else:
             self.statsManager.addScore(10)
+        self.statsManager.addKill()
 
     def move(self):
         """Move the player."""

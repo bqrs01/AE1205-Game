@@ -39,14 +39,26 @@ APPROACH_RADIUS = 100
 MAX_FORCE = 0.1
 
 
+class EnemyAI():
+    def __init__(self, statsManager):
+        self.statsManager = statsManager
+        self.diff_val = [2, 3, 5, 7, 8, 9]
+        self.diff_thres = [5, 12, 20, 30, 50, 1000]
+
+    def get_level(self):
+        for (idx, val) in enumerate(self.diff_thres):
+            if self.statsManager.kills <= val:
+                return idx
+
+    def no_to_generate(self):
+        return self.diff_val[self.get_level()]
+
+
 class EnemyManager(pg.sprite.Group):
     def __init__(self, bulletManager):
         super(EnemyManager, self).__init__()
         # self.enemy_objects = []
         self.bulletManager = bulletManager
-
-    # def add(self, *sprites):
-    #     super().add(*sprites)
 
     def update(self, player, *args):
         for enemy in self.sprites():
@@ -87,8 +99,12 @@ class EnemyManager(pg.sprite.Group):
                     sprite.pos += A_to_B
 
     def generate(self, number=1):
-        if len(self) <= 8:
+        print(len(self))
+        if (len(self) + number) <= 8:
             for _ in range(number):
+                self.add(Enemy(self.bulletManager))
+        else:
+            for _ in range(8 - len(self)):
                 self.add(Enemy(self.bulletManager))
 
     def draw(self, surface):

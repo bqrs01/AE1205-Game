@@ -30,6 +30,7 @@ import threading
 from .. import tools, prepare
 from ..components import player, enemy, bullet, explosion, powerup
 
+# Shortcut for vector
 vec = pg.math.Vector2
 
 
@@ -37,31 +38,39 @@ class GamePlay(tools.State):
     def __init__(self):
         # Call super to initialise everything needed.
         super(GamePlay, self).__init__()
-        # Load background image.
+
+        # BACKGROUND
         self.backgroundImage = pg.image.load(
             os.path.join(os.getcwd(), "src/images/background.png")).convert()
         self.backgroundImage_rect = self.backgroundImage.get_rect(
             topleft=(0, 0))
-        # Initialise dictionary for health bar.
+
+        # HEALTH DISPLAY
         self.heartImages = {}
         self.heartImage = self.load_image(50)
         self.sub_font = pg.font.Font(os.path.join(
             os.getcwd(), "src/fonts/FORTE.TTF"), 25)
+
+        # INFOBAR
         self.infobar = pg.Surface((160, 95))
         self.infobar_rect = self.infobar.get_rect(topleft=(10, 10))
 
-        # Initialise score message text surface.
+        # SCORE MESSAGE
         self.score_message = self.sub_font.render(
             "Score: 0.0", True, pg.Color('black'))
         self.score_message_rect = self.score_message.get_rect(topleft=(5, 10))
+
         # Initialise break message text surface and initialise onBreak, timer properties.
         self.break_message = self.sub_font.render(
             "Cooldown", True, pg.Color('red'))
         self.break_message_rect = self.score_message.get_rect(topleft=(5, 60))
         self.onBreak = False
         self.timer = 0
+
         # Initialise property isPaused to False.
         self.isPaused = False
+
+        # PAUSED SCREEN
         self.paused_font = pg.font.Font(os.path.join(
             os.getcwd(), "src/fonts/FORTE.TTF"), 50)
         self.paused_font_sub = pg.font.Font(os.path.join(
@@ -77,6 +86,7 @@ class GamePlay(tools.State):
         self.dim_screen = pg.Surface(prepare.SCREEN_SIZE).convert_alpha()
         self.dim_screen.fill((0, 0, 0, 180))
 
+        # START SCREEN
         self.isStart = False
         self.start_message = self.paused_font_sub.render(
             "Game is about to start!", True, pg.Color('green'))
@@ -84,13 +94,14 @@ class GamePlay(tools.State):
             center=prepare.SCREEN_CENTER)
         self.last_update = None
 
+        # MISCALLANEOUS
         self.surface = pg.Surface(prepare.SCREEN_SIZE)
         self.bgmusic = {}
-
         self.sub_font_2 = pg.font.Font(os.path.join(
             os.getcwd(), "src/fonts/FORTE.TTF"), 15)
 
     def render_infobar(self, surface):
+        """Function to render and blit the infobar."""
         self.infobar.fill((0, 255, 255))
         self.infobar.set_alpha(80)
         self.infobar.blit(self.score_message, self.score_message_rect)
@@ -127,10 +138,9 @@ class GamePlay(tools.State):
             self.soundManager, self.powerupManager)
         self.enemyManager = enemy.EnemyManager(self.bulletManager)
         self.explosionManager = explosion.ExplosionManager()
+        self.enemyAI = enemy.EnemyAI(self.statsManager)
         self.player = player.Player(
             self.bulletManager, self.statsManager, self.explosionManager)
-        # # Generate one enemy at start of game.
-        # self.enemyManager.generate(1)
         self.isStart = True
         self.current_song = self.sub_font_2.render(
             f"Song: {self.bgmusic['song_name']}", True, pg.color.Color('yellow'))
@@ -155,10 +165,7 @@ class GamePlay(tools.State):
                     if self.onBreak:
                         self.onBreak = False
                     self.timer = 3500
-                    # if not (self.player.safe_zone):
-                    self.enemyManager.generate(2)
-                    # else:
-                    #     self.enemyManager.generate()
+                    self.enemyManager.generate(self.enemyAI.no_to_generate())
                 self.player.update(dt)
                 self.enemyManager.update(self.player,
                                          self.player.exact_pos[0], self.player.exact_pos[1], self.player.isMoving, self.player.safe_zone, dt)
@@ -191,17 +198,11 @@ class GamePlay(tools.State):
     def draw(self, surface):
         """Draw function to draw all game elements on screen."""
         surface.blit(self.backgroundImage, self.backgroundImage_rect)
-        # surface.fill(pg.Color('white'))
-        # pg.draw.rect(surface, pg.Color("darkgreen"), self.rect)
         self.player.draw(surface)
         self.enemyManager.draw(surface)
         self.bulletManager.draw(surface)
         self.explosionManager.draw(surface)
         self.powerupManager.draw(surface)
-        # pg.draw.lines(surface, (0, 0, 0), False, [
-        #     self.player.rect.center, self.player.mouse_position])
-        # surface.blit(self.score_message, self.score_message_rect)
-        # self.draw_health(self.statsManager.health, surface)
 
         self.render_infobar(surface)
 
@@ -219,6 +220,7 @@ class GamePlay(tools.State):
         self.surface = surface.copy()
 
     def load_image(self, health):
+        """Function to load and save images of the different health states."""
         if health in self.heartImages.keys():
             return self.heartImages[health]
         else:
@@ -230,6 +232,7 @@ class GamePlay(tools.State):
             return image
 
     def draw_health(self, health, screen):
+        """Draw heart state to screen."""
         self.heartImage = self.load_image(health)
         screen.blit(self.heartImage, self.heartImage.get_rect(topleft=(5, 42)))
 
@@ -238,12 +241,14 @@ class StatsManager():
     def __init__(self):
         self.score = 0.0
         self.health = 50
+        self.kills = 0
         self.gameOver = False
         self.multiplier = 1.0
         self.infinity = False
         self.powerup_active = False
 
     def set_multiplier(self, mult, resetAfter=20):
+        """Set multiplier to a value temporarily. Useful for powerup."""
         self.multiplier = mult
         self.powerup_active = True
         threading.Timer(resetAfter, self.reset_multiplier).start()
@@ -253,6 +258,7 @@ class StatsManager():
         self.powerup_active = False
 
     def set_infinity(self, resetAfter=15):
+        """Set infinity on temporarily. Useful for powerup."""
         self.infinity = True
         self.powerup_active = True
         threading.Timer(resetAfter, self.reset_infinity).start()
@@ -262,22 +268,27 @@ class StatsManager():
         self.powerup_active = False
 
     def reset_powerups(self):
+        """Reset powerups."""
         self.infinity = False
         self.multiplier = 1.0
         self.powerup_active = False
 
+    def addKill(self):
+        """Add kills to tally."""
+        self.kills += 1
+
     def addScore(self, points):
+        """Add score to tally."""
         self.score += points * self.multiplier
-        print(f"Score: {self.score}")
+        # print(f"Score: {self.score}")
 
     def dropHealth(self, dropBy=10):
+        """Reduce player's health."""
         self.health -= dropBy
-
         if self.health < 5:
             self.health = 0
             threading.Timer(0.5, self.declareGameOver).start()
 
     def declareGameOver(self):
+        """Declare game over."""
         self.gameOver = True
-
-    # print(f"Health: {self.health}")

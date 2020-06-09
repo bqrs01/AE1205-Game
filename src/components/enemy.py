@@ -257,8 +257,15 @@ class Enemy(tools._BaseSprite):
             while True:
                 pos = vec(self.rect.x, self.rect.y)
                 dist = (self.target-pos)
-                any_collided = pg.sprite.spritecollideany(
-                    self, self.groups()[0], collided=self.check_collision_isStart)
+                try:
+                    any_collided = pg.sprite.spritecollideany(
+                        self, self.groups()[0], collided=self.check_collision_isStart)
+                except IndexError:
+
+                    print('1',self.groups())
+                    any_collided = pg.sprite.spritecollideany(
+                        self, self.groups()[0], collided=self.check_collision_isStart)
+
                 if dist.magnitude() <= 500 and any_collided:
                     self.rect.x = random.randint(
                         20, prepare.SCREEN_SIZE[0] - 20)

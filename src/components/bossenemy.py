@@ -89,6 +89,7 @@ class BossEnemyManager(pg.sprite.Group):
                         pass
 
     def generate(self, number=1):
+        # Limit to only one at a given time.
         if not len(self) > 0:
             self.add(BossEnemy(self.bulletManager, self))
 

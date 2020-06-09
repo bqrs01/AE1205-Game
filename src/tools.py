@@ -219,7 +219,7 @@ class Game(object):
             path = os.path.join(os.getcwd(), f"src/data/{filename}")
             exists = os.path.exists(path)
             if not exists or force:
-                f = open(path, 'a')
+                f = open(path, 'w')
                 f.write('{}')
                 f.close()
 
@@ -229,7 +229,7 @@ class Game(object):
                 return json.load(dataFile)
         except (TypeError, json.JSONDecodeError):
             self.setup_data(force=True)
-            return self.get_data(filename)
+            return {}
 
     def set_data(self, filename, objectVar):
         try:
@@ -237,7 +237,7 @@ class Game(object):
                 json.dump(objectVar, dataFile)
         except (TypeError, json.JSONDecodeError):
             self.setup_data(force=True)
-            return self.set_data(filename, objectVar)
+            return {}
 
     def game_music(self, filename):
         # Game music

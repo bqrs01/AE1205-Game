@@ -30,6 +30,8 @@ import os
 import random
 from .. import prepare, tools
 
+POWERUP_SIZE = (40, 40)
+
 
 class PowerupManager(pg.sprite.Group):
     def __init__(self, statsManager, *sprites):
@@ -38,7 +40,6 @@ class PowerupManager(pg.sprite.Group):
 
     def new_powerup(self, center_pos):
         if (len(self) == 0) and (not self.statsManager.powerup_active) and (self.statsManager.cooldown <= 0):
-            print(len(self), self.statsManager.powerup_active)
             self.add(Powerup(center_pos))
         else:
             print('there\'s already a powerup boi!')
@@ -55,17 +56,48 @@ class PowerupManager(pg.sprite.Group):
 class Powerup(tools._BaseSprite):
     def __init__(self, center_pos):
         super().__init__(center_pos, (75, 75))
-        self.image, self.powerup = self.get_image()
-        self.rect = self.image.get_rect()
+        self.powerupImage, self.powerup = self.get_image()
+        self.blankImage = self.get_image(blank=True)
+        self.rect = self.powerupImage.get_rect()
         self.rect.center = center_pos
+        self.time_to_blink = 10000
+        self.time_to_stop = 5000
+        self.blink_cooldown = 150
+        self.blink_on = False
 
-    def get_image(self):
-        powerup = random.choice(["x2", "infinity"])
-        image = pg.image.load(os.path.join(
-            os.getcwd(), f"src/images/powerup_{powerup}.png")).convert_alpha()
-        return image, powerup
+    def get_image(self, blank=False):
+        if blank:
+            base = pg.Surface(POWERUP_SIZE, pg.SRCALPHA).convert()
+            base.fill((255, 255, 0))
+            base.set_colorkey((255, 255, 0))
+            image = base.copy()
+            return image
+        else:
+            powerup = random.choice(["x2", "infinity"])
+            image = pg.image.load(os.path.join(
+                os.getcwd(), f"src/images/powerup_{powerup}.png")).convert_alpha()
+            return image, powerup
 
-    def update(self, player, statsManager):
+    def update(self, player, statsManager, dt):
+        if self.time_to_blink > 0:
+            self.time_to_blink -= dt
+        else:
+            # Start blinking and countdown to stop
+            self.blink_cooldown -= dt
+            if self.blink_cooldown <= 0:
+                self.blink_on = not self.blink_on
+                self.blink_cooldown = 150
+            if self.time_to_stop > 0:
+                self.time_to_stop -= dt
+            else:
+                # Stop blinking
+                self.kill()
+
+        if self.blink_on:
+            self.image = self.blankImage
+        else:
+            self.image = self.powerupImage
+
         collision = pg.sprite.collide_rect(player, self)
         if collision:
             if self.powerup == "x2":

@@ -218,6 +218,11 @@ class GamePlay(tools.State):
         self.highscore_text_rect = self.highscore_text.get_rect(
             bottomright=(1185, 690))
 
+        self.powerup_text = self.sub_font.render(
+            "Active: ", True, pg.Color('yellow'))
+        self.powerup_text_rect = self.powerup_text.get_rect(
+            topright=(1170, 5))
+
         self.last_update = pg.time.get_ticks()
 
         self.isEnd = False
@@ -258,7 +263,7 @@ class GamePlay(tools.State):
                 self.bulletManager.update(
                     self.player, self.enemyManager, self.bossenemyManager, self.explosionManager)
                 self.explosionManager.update()
-                self.powerupManager.update(self.player, self.statsManager)
+                self.powerupManager.update(self.player, self.statsManager, dt)
                 self.statsManager.update(dt)
 
                 self.score_message = self.sub_font.render(
@@ -266,6 +271,14 @@ class GamePlay(tools.State):
 
                 self.current_song = self.sub_font_2.render(
                     f"Song: {self.bgmusic['song_name']}", True, pg.color.Color('yellow'))
+
+                if self.statsManager.powerup_active:
+                    self.powerup_image = pg.image.load(os.path.join(
+                        os.getcwd(), f"src/images/powerup_{self.statsManager.powerup_active_name}.png")).convert_alpha()
+                    self.powerup_image = pg.transform.scale(
+                        self.powerup_image, (25, 25))
+                    self.powerup_image_rect = self.powerup_image.get_rect(
+                        topright=(1195, 5))
 
                 # If there are no enemies left...
                 if (len(self.enemyManager) == 0):
@@ -294,6 +307,10 @@ class GamePlay(tools.State):
         self.powerupManager.draw(surface)
 
         self.render_infobar(surface)
+
+        if self.statsManager.powerup_active:
+            surface.blit(self.powerup_image, self.powerup_image_rect)
+            surface.blit(self.powerup_text, self.powerup_text_rect)
 
         if not self.isEnd:
             surface.blit(self.current_song, self.current_song_rect)
@@ -338,33 +355,39 @@ class StatsManager():
         self.multiplier = 1.0
         self.infinity = False
         self.powerup_active = False
-        self.cooldown = 5000
+        self.powerup_active_name = ""
+        self.cooldown = 0
 
-    def set_multiplier(self, mult, resetAfter=20):
+    def set_multiplier(self, mult, resetAfter=15):
         """Set multiplier to a value temporarily. Useful for powerup."""
         self.multiplier = mult
+        self.powerup_active_name = "x2"
         self.powerup_active = True
         threading.Timer(resetAfter, self.reset_multiplier).start()
 
     def reset_multiplier(self):
         self.multiplier = 1.0
         self.powerup_active = False
+        self.startCooldown()
 
     def set_infinity(self, resetAfter=15):
         """Set infinity on temporarily. Useful for powerup."""
         self.infinity = True
+        self.powerup_active_name = "infinity"
         self.powerup_active = True
         threading.Timer(resetAfter, self.reset_infinity).start()
 
     def reset_infinity(self):
         self.infinity = False
         self.powerup_active = False
+        self.startCooldown()
 
     def reset_powerups(self):
         """Reset powerups."""
         self.infinity = False
         self.multiplier = 1.0
         self.powerup_active = False
+        self.powerup_active_name = ""
 
     def addKill(self):
         """Add kills to tally."""
@@ -383,7 +406,7 @@ class StatsManager():
             threading.Timer(0.5, self.declareGameOver).start()
 
     def startCooldown(self):
-        self.cooldown = 5000
+        self.cooldown = 15000
 
     def declareGameOver(self):
         """Declare game over."""

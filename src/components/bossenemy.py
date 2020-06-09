@@ -89,8 +89,8 @@ class BossEnemyManager(pg.sprite.Group):
                         pass
 
     def generate(self, number=1):
-        # print(len(self))
-        self.add(BossEnemy(self.bulletManager, self))
+        if not len(self) > 0:
+            self.add(BossEnemy(self.bulletManager, self))
 
     def draw(self, surface):
         for enemy in self.sprites():
@@ -140,16 +140,16 @@ class BossEnemy(tools._BaseSprite):
         #     os.path.join(os.getcwd(), "src/images/greenplain.png")).convert_alpha()
         # self.enemyImage = pg.transform.scale(self.enemyImage, (64, 64))
 
-        self.enemyImages = self.generate_images()
+        self.lives = 10
+        self.dead = False
 
-        self.image = self.make_image(self.enemyImage)
+        self.enemyImages = self.generate_images()
+        self.image = self.make_image()
+
         self.shooting_timer = 500
         self.time_between_bullets = 50
         self.bulletcounter = 6
         self.number_bullets = 6
-
-        self.lives = 10
-        self.dead = False
 
     def generate_images(self):
         images = {}
@@ -167,7 +167,7 @@ class BossEnemy(tools._BaseSprite):
         y = random.randint(*r_y)
         return (x, y)
 
-    def make_image(self, imageA):
+    def make_image(self):
         base = pg.Surface(CELL_SIZE, pg.SRCALPHA).convert()
         base.fill((255, 255, 0))
         # base.set_alpha(0)
@@ -300,5 +300,5 @@ class BossEnemy(tools._BaseSprite):
             self.move(self.target)
 
         # self.checkOutOfBounds()
-        self.image = self.make_image(self.enemyImage)
+        self.image = self.make_image()
         self.rect.center = self.pos

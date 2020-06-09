@@ -26,6 +26,7 @@ import sys
 import pygame as pg
 import os
 import threading
+import random
 
 from .. import tools, prepare
 from ..components import player, enemy, bullet, explosion, powerup, bossenemy
@@ -217,9 +218,10 @@ class GamePlay(tools.State):
 
     def update(self, dt):
         """Update function to update sprite position and graphics."""
-        if self.statsManager.score >= 10 * self.bosscounter:
-            self.bossenemyManager.generate(1)
-            self.bosscounter += 1
+        if self.statsManager.score >= 1000 * self.bosscounter:
+            if random.random > 0.05:
+                self.bossenemyManager.generate(1)
+                self.bosscounter += 1
         if not self.statsManager.gameOver:
             if self.isPaused:
                 # Do not update game if paused
@@ -245,7 +247,7 @@ class GamePlay(tools.State):
                                              self.player.isMoving,
                                              self.player.safe_zone, dt)
                 self.bulletManager.update(
-                    self.player, self.enemyManager,self.bossenemyManager, self.explosionManager)
+                    self.player, self.enemyManager, self.bossenemyManager, self.explosionManager)
                 self.explosionManager.update()
                 self.powerupManager.update(self.player, self.statsManager)
 

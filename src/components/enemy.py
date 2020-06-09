@@ -168,7 +168,7 @@ class Enemy(tools._BaseSprite):
         y = random.randint(*r_y)
         return (x, y)
 
-    def make_image(self, imageA):
+    def make_image(self, d):
         base = pg.Surface(CELL_SIZE, pg.SRCALPHA).convert()
         base.fill((255, 255, 0))
         # base.set_alpha(0)

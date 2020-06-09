@@ -334,7 +334,7 @@ class Game(object):
             self.state.bgmusic["current_position"] = (0, 0)
             self.state.bgmusic["song_length"] = self.get_min_and_secs(
                 self.music_end-self.music_start)
-            print(song_names[self.music_index])
+            # print(song_names[self.music_index])
             pg.mixer.music.play(start=self.music_start)
         if self.state.quit:
             self.done = True

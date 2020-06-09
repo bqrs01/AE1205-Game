@@ -1,5 +1,5 @@
 """
- File: enemy.py
+ File: bossenemy.py
  Authors: Mario Padrón Tardáguila & Bryan Quadras
  
  Copyright (c) 2020 Mario Padrón Tardáguila & Bryan Quadras
@@ -22,7 +22,7 @@
  ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
->>> This module contains the class for the enemy.
+>>> This module contains the class for the boss enemy.
 """
 import pygame as pg
 import os
@@ -84,13 +84,13 @@ class BossEnemyManager(pg.sprite.Group):
                     try:
                         A_to_B.scale_to_length(magnitude)
                         sprite.pos += A_to_B
-                    except ValueError:
-                        A_to_B.scale_to_length(1.5)
-                        sprite.pos += A_to_B
+                    except Exception:
+                        # Do nothing
+                        pass
 
     def generate(self, number=1):
-        print(len(self))
-        self.add(BossEnemy(self.bulletManager))
+        # print(len(self))
+        self.add(BossEnemy(self.bulletManager, self))
 
     def draw(self, surface):
         for enemy in self.sprites():
@@ -182,13 +182,6 @@ class BossEnemy(tools._BaseSprite):
         elif self.pos.y > bottom:
             self.pos.y = bottom
 
-    # def update_angle(self, position):
-    #     # Gets position of the mouse
-    #     playerx, playery = position
-    #     # To calculate the angle
-    #     self.angle = atan2(-(playerx -
-    #                          self.rect.center[1]), (playery - self.rect.center[0])) * 180 / pi
-
     def rot_center(self, image, angle):
         center = image.get_rect().center
         rotated_image = pg.transform.rotate(image, angle)
@@ -241,16 +234,16 @@ class BossEnemy(tools._BaseSprite):
             while True:
                 pos = vec(self.rect.x, self.rect.y)
                 dist = (self.target - pos)
-                try:
-                    any_collided = pg.sprite.spritecollideany(
-                        self, self.groups()[0], collided=self.check_collision_isStart)
-                except IndexError:
+                # try:
+                #     any_collided = pg.sprite.spritecollideany(
+                #         self, self.groups()[0], collided=self.check_collision_isStart)
+                # except IndexError:
 
-                    print('1', self.groups())
-                    any_collided = pg.sprite.spritecollideany(
-                        self, self.groups()[0], collided=self.check_collision_isStart)
+                #     print('1', self.groups())
+                #     any_collided = pg.sprite.spritecollideany(
+                #         self, self.groups()[0], collided=self.check_collision_isStart)
 
-                if dist.magnitude() <= 500 and any_collided:
+                if dist.magnitude() <= 500:
                     self.rect.x = random.randint(
                         20, prepare.SCREEN_SIZE[0] - 20)
                     self.rect.y = random.randint(

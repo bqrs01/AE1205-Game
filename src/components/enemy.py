@@ -99,12 +99,12 @@ class EnemyManager(pg.sprite.Group):
                     try:
                         A_to_B.scale_to_length(magnitude)
                         sprite.pos += A_to_B
-                    except ValueError:
-                        A_to_B.scale_to_length(1.5)
-                        sprite.pos += A_to_B
+                    except Exception:
+                        # Do nothing
+                        pass
 
     def generate(self, number=1):
-        print(len(self))
+        # print(len(self))
         if (len(self) + number) <= 8:
             for _ in range(number):
                 self.add(Enemy(self.bulletManager))
@@ -257,16 +257,16 @@ class Enemy(tools._BaseSprite):
             while True:
                 pos = vec(self.rect.x, self.rect.y)
                 dist = (self.target-pos)
-                try:
-                    any_collided = pg.sprite.spritecollideany(
-                        self, self.groups()[0], collided=self.check_collision_isStart)
-                except IndexError:
+                # try:
+                #     any_collided = pg.sprite.spritecollideany(
+                #         self, self.groups()[0], collided=self.check_collision_isStart)
+                # except IndexError:
 
-                    print('1',self.groups())
-                    any_collided = pg.sprite.spritecollideany(
-                        self, self.groups()[0], collided=self.check_collision_isStart)
+                #     print('1', self.groups())
+                #     any_collided = pg.sprite.spritecollideany(
+                #         self, self.groups()[0], collided=self.check_collision_isStart)
 
-                if dist.magnitude() <= 500 and any_collided:
+                if dist.magnitude() <= 500:
                     self.rect.x = random.randint(
                         20, prepare.SCREEN_SIZE[0] - 20)
                     self.rect.y = random.randint(

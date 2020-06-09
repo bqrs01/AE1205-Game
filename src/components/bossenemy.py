@@ -143,6 +143,7 @@ class BossEnemy(tools._BaseSprite):
         self.shooting_timer = 500
         self.time_between_bullets = 50
         self.bulletcounter = 6
+        self.number_bullets = 6
 
     def random_pos(self):
         r_x = random.choice([(40, 100), (1100, 1160)])
@@ -266,11 +267,11 @@ class BossEnemy(tools._BaseSprite):
             self.shooting_timer -= dt
             if self.shooting_timer <= 0:
                 self.time_between_bullets -= dt
-            if self.shooting_timer <= 0 and self.time_between_bullets <= 0 and self.bulletcounter < 6:
+            if self.shooting_timer <= 0 and self.time_between_bullets <= 0 and self.bulletcounter < self.number_bullets:
                 self.bulletcounter += 1
                 self.shoot()
                 self.time_between_bullets = 50
-            elif self.bulletcounter == 6:
+            elif self.bulletcounter == self.number_bullets:
                 self.bulletcounter = 0
                 self.shooting_timer = 500
 

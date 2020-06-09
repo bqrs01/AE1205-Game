@@ -28,7 +28,7 @@ import os
 import threading
 
 from .. import tools, prepare
-from ..components import player, enemy, bullet, explosion, powerup
+from ..components import player, enemy, bullet, explosion, powerup, bossenemy
 
 # Shortcut for vector
 vec = pg.math.Vector2
@@ -79,7 +79,7 @@ class GamePlay(tools.State):
         self.paused_message = self.paused_font.render(
             "Paused", True, pg.Color('green'))
         self.paused_message_rect = self.paused_message.get_rect(
-            center=(prepare.SCREEN_CENTER[0], prepare.SCREEN_CENTER[1]-40))
+            center=(prepare.SCREEN_CENTER[0], prepare.SCREEN_CENTER[1] - 40))
         # self.paused_message_subtitle = self.paused_font_sub.render(
         #     "Press ESC to start playing", True, pg.Color('red'))
         # self.paused_message_subtitle_rect = self.paused_message_subtitle.get_rect(
@@ -113,6 +113,8 @@ class GamePlay(tools.State):
         self.bgmusic = {}
         self.sub_font_2 = pg.font.Font(os.path.join(
             os.getcwd(), "src/fonts/FORTE.TTF"), 15)
+
+        self.bosscounter = 1
 
     def render_infobar(self, surface):
         """Function to render and blit the infobar."""
@@ -197,6 +199,7 @@ class GamePlay(tools.State):
         self.powerupManager = powerup.PowerupManager(self.statsManager)
         self.bulletManager = bullet.BulletManager(
             self.soundManager, self.powerupManager)
+        self.bossenemyManager = bossenemy.BossEnemyManager(self.bulletManager)
         self.enemyManager = enemy.EnemyManager(self.bulletManager)
         self.explosionManager = explosion.ExplosionManager()
         self.enemyAI = enemy.EnemyAI(self.statsManager)
@@ -214,6 +217,9 @@ class GamePlay(tools.State):
 
     def update(self, dt):
         """Update function to update sprite position and graphics."""
+        if self.statsManager.score / (self.bosscounter * 100) == 1:
+            self.bossenemyManager.generate(1)
+            self.bosscounter += 1
         if not self.statsManager.gameOver:
             if self.isPaused:
                 # Do not update game if paused
@@ -232,7 +238,11 @@ class GamePlay(tools.State):
                     self.enemyManager.generate(self.enemyAI.no_to_generate())
                 self.player.update(dt)
                 self.enemyManager.update(self.player,
-                                         self.player.exact_pos[0], self.player.exact_pos[1], self.player.isMoving, self.player.safe_zone, dt)
+                                         self.player.exact_pos[0], self.player.exact_pos[1], self.player.isMoving,
+                                         self.player.safe_zone, dt)
+                self.bossenemyManager.update(self.player, self.player.exact_pos[0], self.player.exact_pos[1],
+                                             self.player.isMoving,
+                                             self.player.safe_zone, dtw)
                 self.bulletManager.update(
                     self.player, self.enemyManager, self.explosionManager)
                 self.explosionManager.update()
@@ -265,6 +275,7 @@ class GamePlay(tools.State):
         surface.blit(self.backgroundImage, self.backgroundImage_rect)
         self.player.draw(surface)
         self.enemyManager.draw(surface)
+        self.bossenemyManager.draw(surface)
         self.bulletManager.draw(surface)
         self.explosionManager.draw(surface)
         self.powerupManager.draw(surface)

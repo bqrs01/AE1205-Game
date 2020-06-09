@@ -162,8 +162,8 @@ class Enemy(tools._BaseSprite):
         self.image = self.make_image(self.enemyImage)
 
     def random_pos(self):
-        r_x = random.choice([(40, 100), (1100, 1160)])
-        r_y = random.choice([(40, 100), (600, 660)])
+        r_x = random.choice([(180, 220), (1100, 1160)])
+        r_y = random.choice([(120, 160), (600, 660)])
         x = random.randint(*r_x)
         y = random.randint(*r_y)
         return (x, y)
@@ -257,20 +257,9 @@ class Enemy(tools._BaseSprite):
             while True:
                 pos = vec(self.rect.x, self.rect.y)
                 dist = (self.target-pos)
-                # try:
-                #     any_collided = pg.sprite.spritecollideany(
-                #         self, self.groups()[0], collided=self.check_collision_isStart)
-                # except IndexError:
-
-                #     print('1', self.groups())
-                #     any_collided = pg.sprite.spritecollideany(
-                #         self, self.groups()[0], collided=self.check_collision_isStart)
-
                 if dist.magnitude() <= 500:
-                    self.rect.x = random.randint(
-                        20, prepare.SCREEN_SIZE[0] - 20)
-                    self.rect.y = random.randint(
-                        20, prepare.SCREEN_SIZE[1] - 20)
+                    newpos = self.random_pos()
+                    self.rect.x, self.rect.y = newpos
                 else:
                     break
             self.pos = vec(self.rect.x, self.rect.y)

@@ -58,7 +58,7 @@ class GamePlay(tools.State):
 
         # SCORE MESSAGE
         self.score_message = self.sub_font.render(
-            "Score: 0.0", True, pg.Color('black'))
+            "Score: 0", True, pg.Color('black'))
         self.score_message_rect = self.score_message.get_rect(topleft=(5, 10))
 
         # Initialise break message text surface and initialise onBreak, timer properties.
@@ -112,6 +112,7 @@ class GamePlay(tools.State):
         # MISCALLANEOUS
         self.surface = pg.Surface(prepare.SCREEN_SIZE)
         self.bgmusic = {}
+        self.highscore = {}
         self.sub_font_2 = pg.font.Font(os.path.join(
             os.getcwd(), "src/fonts/FORTE.TTF"), 15)
 
@@ -120,7 +121,7 @@ class GamePlay(tools.State):
     def render_infobar(self, surface):
         """Function to render and blit the infobar."""
         self.infobar.fill((0, 255, 255))
-        self.infobar.set_alpha(80)
+        self.infobar.set_alpha(150)
         self.infobar.blit(self.score_message, self.score_message_rect)
         if self.onBreak:
             self.infobar.blit(self.break_message, self.break_message_rect)
@@ -211,10 +212,18 @@ class GamePlay(tools.State):
             f"Song: {self.bgmusic['song_name']}", True, pg.color.Color('yellow'))
         self.current_song_rect = self.current_song.get_rect(
             bottomleft=(15, 690))
+
+        self.highscore_text = self.sub_font_2.render(
+            f"Highscore: {self.highscore['get_highscore']()}", True, pg.color.Color('yellow'))
+        self.highscore_text_rect = self.highscore_text.get_rect(
+            bottomright=(1185, 690))
+
         self.last_update = pg.time.get_ticks()
 
         self.isEnd = False
         self.isPaused = False
+
+        print("Highscore:", self.highscore["get_highscore"]())
 
     def update(self, dt):
         """Update function to update sprite position and graphics."""
@@ -250,6 +259,7 @@ class GamePlay(tools.State):
                     self.player, self.enemyManager, self.bossenemyManager, self.explosionManager)
                 self.explosionManager.update()
                 self.powerupManager.update(self.player, self.statsManager)
+                self.statsManager.update(dt)
 
                 self.score_message = self.sub_font.render(
                     f"Score: {self.statsManager.score}", True, pg.Color('black'))
@@ -287,6 +297,7 @@ class GamePlay(tools.State):
 
         if not self.isEnd:
             surface.blit(self.current_song, self.current_song_rect)
+            surface.blit(self.highscore_text, self.highscore_text_rect)
 
         if self.isPaused:
             surface.blit(self.dim_screen, (0, 0))
@@ -320,13 +331,14 @@ class GamePlay(tools.State):
 
 class StatsManager():
     def __init__(self):
-        self.score = 0.0
+        self.score = 0
         self.health = 50
         self.kills = 0
         self.gameOver = False
         self.multiplier = 1.0
         self.infinity = False
         self.powerup_active = False
+        self.cooldown = 5000
 
     def set_multiplier(self, mult, resetAfter=20):
         """Set multiplier to a value temporarily. Useful for powerup."""
@@ -360,7 +372,7 @@ class StatsManager():
 
     def addScore(self, points):
         """Add score to tally."""
-        self.score += points * self.multiplier
+        self.score += int(points * self.multiplier)
         # print(f"Score: {self.score}")
 
     def dropHealth(self, dropBy=10):
@@ -370,6 +382,13 @@ class StatsManager():
             self.health = 0
             threading.Timer(0.5, self.declareGameOver).start()
 
+    def startCooldown(self):
+        self.cooldown = 5000
+
     def declareGameOver(self):
         """Declare game over."""
         self.gameOver = True
+
+    def update(self, dt):
+        if self.cooldown > 0:
+            self.cooldown -= dt

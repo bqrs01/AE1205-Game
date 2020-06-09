@@ -195,7 +195,7 @@ class Game(object):
         self.state_name = start_state
         self.state = self.states[self.state_name]
 
-        self.filenames = ['prefs.json']
+        self.filenames = ['prefs.json', 'highscore.json']
         self.setup_data()
 
         self.music_vol = self.get_music_volume()
@@ -208,7 +208,8 @@ class Game(object):
         self.music_end = self.music_pos[self.music_index + 1]
         self.music_current_seek = self.music_start
         self.game_music("music.ogg")
-        # Get it from file..
+
+        self.highscore = self.get_highscore()
 
     def setup_data(self, force=False):
         basedir = os.path.dirname(os.path.join(os.getcwd(), f"src/data/"))
@@ -244,7 +245,7 @@ class Game(object):
             os.getcwd(), f"src/soundeffects/{filename}"))
         pg.mixer.music.set_volume(self.music_vol)
         pg.mixer.music.play(start=self.music_start)
-        self.set_bgmusic()
+        self.set_state()
 
     def pause_music(self, duration):
         pg.mixer.music.pause()
@@ -259,6 +260,28 @@ class Game(object):
             return (data['music_volume'])
         except TypeError:
             self.setup_data(force=True)
+
+    def get_highscore(self):
+        data = self.get_data('highscore.json')
+        try:
+            if not "highscore" in data:
+                data['highscore'] = 0
+                self.set_data('highscore.json', data)
+            return (data['highscore'])
+        except TypeError:
+            self.setup_data(force=True)
+
+    # def get_highscore(self):
+    #     return self.highscore
+
+    def set_highscore(self, newHighscore):
+        self.highscore = newHighscore
+        self.save_highscore()
+
+    def save_highscore(self):
+        data = self.get_data('highscore.json')
+        data['highscore'] = self.highscore
+        self.set_data('highscore.json', data)
 
     def set_music_volume(self, newVolume):
         self.music_vol = newVolume
@@ -303,16 +326,20 @@ class Game(object):
         self.state_name = next_state
         game_data = self.state.game_data  # Persistent data
         self.state = self.states[self.state_name]
-        self.set_bgmusic()
+        self.set_state()
         self.state.startup(game_data)
 
-    def set_bgmusic(self):
+    def set_state(self):
         self.state.bgmusic = {
             "song_name": song_names[self.music_index], "pause_music": self.pause_music,
             "get_volume": self.get_music_volume, "set_volume": self.set_music_volume,
             "save_volume": self.save_music_volume, "get_sfx_volume": self.get_sfx_volume,
             "set_sfx_volume": self.set_sfx_volume, "current_position": self.get_min_and_secs(self.music_current_seek),
-            "song_length": self.get_min_and_secs(self.music_end-self.music_start)}
+            "song_length": self.get_min_and_secs(self.music_end-self.music_start)
+        }
+        self.state.highscore = {
+            "get_highscore": self.get_highscore, "set_highscore": self.set_highscore
+        }
 
     def toggle_show_fps(self, key):
         """Press f5 to turn on/off displaying the framerate in the caption."""

@@ -37,7 +37,8 @@ class PowerupManager(pg.sprite.Group):
         self.statsManager = statsManager
 
     def new_powerup(self, center_pos):
-        if (len(self) == 0) and not self.statsManager.powerup_active:
+        if (len(self) == 0) and (not self.statsManager.powerup_active) and (self.statsManager.cooldown <= 0):
+            print(len(self), self.statsManager.powerup_active)
             self.add(Powerup(center_pos))
         else:
             print('there\'s already a powerup boi!')

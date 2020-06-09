@@ -47,6 +47,8 @@ class GameOver(tools.State):
         self.buttons_rects = []
         self.focused_button = -1
 
+        self.highscore = {}
+
         self.get_button_images()
 
     def get_button_images(self):
@@ -105,13 +107,29 @@ class GameOver(tools.State):
 
         # Set title
         self.title = self.font_forte_large.render(
-            "Game Over!", True, pg.Color("dodgerblue"))
+            "Game Over!", True, pg.Color("lightblue"))
         self.title_rect = self.title.get_rect(
-            center=(self.screen_rect.center[0], self.screen_rect.center[1]-45))
+            center=(self.screen_rect.center[0], self.screen_rect.center[1]-90))
 
         self.subtitle = self.font_forte_med.render(
-            f"You got a score of {game_data['final_score']}", True, pg.Color('darkgreen'))
+            f"You got a score of {game_data['final_score']}", True, pg.Color('green'))
         self.subtitle_rect = self.subtitle.get_rect(
+            center=(self.screen_rect.center[0], self.screen_rect.center[1]-45))
+
+        highscore = self.highscore['get_highscore']()
+        player_score = game_data['final_score']
+
+        max_score = max(highscore, player_score)
+        self.highscore["set_highscore"](max_score)
+
+        if player_score > highscore:
+            text = f"This is your new highscore!"
+        else:
+            text = f"Your highscore is still {highscore}!"
+
+        self.highscore_text = self.font_forte_med.render(
+            text, True, pg.Color('yellow'))
+        self.highscore_text_rect = self.highscore_text.get_rect(
             center=(self.screen_rect.center[0], self.screen_rect.center[1]))
 
         self.soundManager.playSound('GameOver.mp3', duration=3000)
@@ -135,4 +153,5 @@ class GameOver(tools.State):
         surface.blit(self.dim_screen, self.dim_screen.get_rect(topleft=(0, 0)))
         surface.blit(self.title, self.title_rect)
         surface.blit(self.subtitle, self.subtitle_rect)
+        surface.blit(self.highscore_text, self.highscore_text_rect)
         self.draw_buttons(surface)

@@ -217,7 +217,7 @@ class GamePlay(tools.State):
 
     def update(self, dt):
         """Update function to update sprite position and graphics."""
-        if self.statsManager.score / (self.bosscounter * 100) == 1:
+        if self.statsManager.score >= 10 * self.bosscounter:
             self.bossenemyManager.generate(1)
             self.bosscounter += 1
         if not self.statsManager.gameOver:
@@ -245,7 +245,7 @@ class GamePlay(tools.State):
                                              self.player.isMoving,
                                              self.player.safe_zone, dt)
                 self.bulletManager.update(
-                    self.player, self.enemyManager, self.explosionManager)
+                    self.player, self.enemyManager,self.bossenemyManager, self.explosionManager)
                 self.explosionManager.update()
                 self.powerupManager.update(self.player, self.statsManager)
 

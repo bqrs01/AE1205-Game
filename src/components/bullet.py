@@ -56,13 +56,13 @@ class BulletManager(pg.sprite.Group):
     def add(self, *sprites):
         super().add(*sprites)
 
-    def update(self, player, enemyManager, explosionManager, *args):
+    def update(self, player, enemyManager, bossenemyManager, explosionManager, *args):
         for bullet in self.sprites():
             bullet.update(*args)
 
         self.checkCollisionWithPlayer(player)
         self.checkCollisionWithEnemy(enemyManager, explosionManager, player)
-        self.checkCollisionWithBossEnemy(enemyManager,explosionManager,player)
+        self.checkCollisionWithBossEnemy(bossenemyManager,explosionManager,player)
 
     def checkCollisionWithPlayer(self, player):
         collisions = pg.sprite.spritecollide(

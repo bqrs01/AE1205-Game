@@ -32,13 +32,11 @@ from .. import prepare, tools
 
 vec = pg.math.Vector2
 
-ENEMY_SIZE = (32, 32)
-CELL_SIZE = (46, 46)
+ENEMY_SIZE = (64, 64)
+CELL_SIZE = (90, 90)
 MAX_SPEED = 5
 APPROACH_RADIUS = 100
 MAX_FORCE = 0.1
-
-
 
 
 class BossEnemyManager(pg.sprite.Group):
@@ -67,8 +65,8 @@ class BossEnemyManager(pg.sprite.Group):
         #     c_with_pl = pg.sprite.collide_rect(player, enemy)
         #     if not (c_with_pl and bullet.owner == player):
 
-            # print("You got shot!")
-            # Keep score....
+        # print("You got shot!")
+        # Keep score....
 
     def collided(self, spriteC):
         for sprite in self.sprites():
@@ -77,7 +75,7 @@ class BossEnemyManager(pg.sprite.Group):
                 A_y = sprite.rect.y
                 B_x = spriteC.rect.x
                 B_y = spriteC.rect.y
-                A_to_B = vec((B_x-A_x, B_y-A_y))
+                A_to_B = vec((B_x - A_x, B_y - A_y))
                 A_to_B.rotate_ip(180)
                 # reverse = tools.Vector(
                 #     30, tools.Vector.getReverseDirection(A_to_B))
@@ -93,6 +91,7 @@ class BossEnemyManager(pg.sprite.Group):
     def generate(self, number=1):
         print(len(self))
         self.add(BossEnemy(self.bulletManager))
+
     def draw(self, surface):
         for enemy in self.sprites():
             enemy.draw(surface)
@@ -139,8 +138,11 @@ class BossEnemy(tools._BaseSprite):
 
         self.enemyImage = pg.image.load(
             os.path.join(os.getcwd(), "src/images/greenplain.png")).convert_alpha()
-        self.enemyImage = pg.transform.scale(self.enemyImage, (32, 32))
+        self.enemyImage = pg.transform.scale(self.enemyImage, (64, 64))
         self.image = self.make_image(self.enemyImage)
+        self.shooting_timer = 500
+        self.time_between_bullets = 50
+        self.bulletcounter = 6
 
     def random_pos(self):
         r_x = random.choice([(40, 100), (1100, 1160)])
@@ -156,7 +158,7 @@ class BossEnemy(tools._BaseSprite):
         base.set_colorkey((255, 255, 0))
         image = base.copy()
         rotatedImage, origin = tools.rotateImage(image, self.enemyImage,
-                                                 (23, 23), (16, 16), self.angle)
+                                                 (46, 46), (32, 32), self.angle)
         image.blit(rotatedImage, origin)
         return image
 
@@ -238,13 +240,13 @@ class BossEnemy(tools._BaseSprite):
             # Check if enemy is close to player at start
             while True:
                 pos = vec(self.rect.x, self.rect.y)
-                dist = (self.target-pos)
+                dist = (self.target - pos)
                 try:
                     any_collided = pg.sprite.spritecollideany(
                         self, self.groups()[0], collided=self.check_collision_isStart)
                 except IndexError:
 
-                    print('1',self.groups())
+                    print('1', self.groups())
                     any_collided = pg.sprite.spritecollideany(
                         self, self.groups()[0], collided=self.check_collision_isStart)
 
@@ -265,10 +267,19 @@ class BossEnemy(tools._BaseSprite):
         self.update_angle(self.target)
 
         # Randomly decide to shoot
-        rn = random.randint(1, 600)
-        if rn == 25:
-            if not safe_zone:
+
+        if not safe_zone:
+            print(self.shooting_timer)
+            self.shooting_timer -= dt
+            if self.shooting_timer <= 0:
+                self.time_between_bullets -= dt
+            if self.shooting_timer <= 0 and self.time_between_bullets <= 0 and self.bulletcounter < 6:
+                self.bulletcounter += 1
                 self.shoot()
+                self.time_between_bullets = 50
+            elif self.bulletcounter == 6:
+                self.bulletcounter = 0
+                self.shooting_timer = 500
 
         if not (safe_zone):
             # Update velocity, acceleration and position

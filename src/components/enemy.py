@@ -94,9 +94,14 @@ class EnemyManager(pg.sprite.Group):
                 A_to_B.rotate_ip(180)
                 # reverse = tools.Vector(
                 #     30, tools.Vector.getReverseDirection(A_to_B))
-                if sprite.vel.magnitude() != 0:
-                    A_to_B.scale_to_length(sprite.vel.magnitude())
-                    sprite.pos += A_to_B
+                magnitude = sprite.vel.magnitude()
+                if magnitude != 0:
+                    try:
+                        A_to_B.scale_to_length(magnitude)
+                        sprite.pos += A_to_B
+                    except ValueError:
+                        A_to_B.scale_to_length(1.5)
+                        sprite.pos += A_to_B
 
     def generate(self, number=1):
         print(len(self))
@@ -239,6 +244,9 @@ class Enemy(tools._BaseSprite):
         """Intialise a bullet and shoot."""
         self.bulletManager.new(self, 'blackbullet')
 
+    def check_collision_isStart(self, s1, s2):
+        return s1 != s2 and s1.rect.colliderect(s2.rect)
+
     def update(self, playerx, playery, playerIsMoving, safe_zone, dt, *args):
         """Updates player every frame."""
         # Set target vector
@@ -249,7 +257,9 @@ class Enemy(tools._BaseSprite):
             while True:
                 pos = vec(self.rect.x, self.rect.y)
                 dist = (self.target-pos)
-                if dist.magnitude() <= 500:
+                any_collided = pg.sprite.spritecollideany(
+                    self, self.groups()[0], collided=self.check_collision_isStart)
+                if dist.magnitude() <= 500 and any_collided:
                     self.rect.x = random.randint(
                         20, prepare.SCREEN_SIZE[0] - 20)
                     self.rect.y = random.randint(

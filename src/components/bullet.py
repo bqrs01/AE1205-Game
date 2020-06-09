@@ -62,7 +62,8 @@ class BulletManager(pg.sprite.Group):
 
         self.checkCollisionWithPlayer(player)
         self.checkCollisionWithEnemy(enemyManager, explosionManager, player)
-        self.checkCollisionWithBossEnemy(bossenemyManager,explosionManager,player)
+        self.checkCollisionWithBossEnemy(
+            bossenemyManager, explosionManager, player)
 
     def checkCollisionWithPlayer(self, player):
         collisions = pg.sprite.spritecollide(
@@ -78,7 +79,6 @@ class BulletManager(pg.sprite.Group):
 
     def checkCollisionWithEnemy(self, enemyManager, explosionManager, player):
         collisions = pg.sprite.groupcollide(self, enemyManager, False, False)
-        # {bullet1: enemy3, bullet2: enemy4}
         for bullet in collisions:
             enemyCollided = collisions[bullet]
             if not (type(bullet.owner) == enemy.Enemy or type(bullet.owner) == bossenemy.BossEnemy):
@@ -91,21 +91,24 @@ class BulletManager(pg.sprite.Group):
                 # Randomly decide if powerup should appear
                 if (random.random() > 0.92):
                     self.powerupManager.new_powerup(enemyPos)
+
     def checkCollisionWithBossEnemy(self, enemyManager, explosionManager, player):
         collisions = pg.sprite.groupcollide(self, enemyManager, False, False)
-        # {bullet1: enemy3, bullet2: enemy4}
         for bullet in collisions:
             enemyCollided = collisions[bullet]
             if not (type(bullet.owner) == bossenemy.BossEnemy or type(bullet.owner) == enemy.Enemy):
                 bullet.kill()
-                # Player shot enemy successfully
-                enemyPos = enemyCollided[0].pos
-                explosionManager.new_explosion((enemyPos.x, enemyPos.y))
-                enemyCollided[0].kill()
+                # Player shot boss enemy successfully. So reduce lives by 1.
+                enemyCollided[0].got_shot()
+                if enemyCollided[0].dead:
+                    enemyPos = enemyCollided[0].pos
+                    explosionManager.new_explosion((enemyPos.x, enemyPos.y))
+                    enemyCollided[0].kill()
+
+                    if (random.random() > 0.92):
+                        self.powerupManager.new_powerup(enemyPos)
                 player.enemy_shot()
                 # Randomly decide if powerup should appear
-                if (random.random() > 0.92):
-                    self.powerupManager.new_powerup(enemyPos)
 
     # def checkIfCollidedIsPlayer(self, player, bullet):
     #     if bullet.owner == player:

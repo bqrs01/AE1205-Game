@@ -136,14 +136,29 @@ class BossEnemy(tools._BaseSprite):
         self.capture_position_now = False
         self.capture_position_time = 0
 
-        self.enemyImage = pg.image.load(
-            os.path.join(os.getcwd(), "src/images/greenplain.png")).convert_alpha()
-        self.enemyImage = pg.transform.scale(self.enemyImage, (64, 64))
+        # self.enemyImage = pg.image.load(
+        #     os.path.join(os.getcwd(), "src/images/greenplain.png")).convert_alpha()
+        # self.enemyImage = pg.transform.scale(self.enemyImage, (64, 64))
+
+        self.enemyImages = self.generate_images()
+
         self.image = self.make_image(self.enemyImage)
         self.shooting_timer = 500
         self.time_between_bullets = 50
         self.bulletcounter = 6
         self.number_bullets = 6
+
+        self.lives = 10
+        self.dead = False
+
+    def generate_images(self):
+        images = {}
+        for i in range(1, 11):
+            image = pg.image.load(
+                os.path.join(os.getcwd(), f"src/images/greenplain{i}.png")).convert_alpha()
+            image = pg.transform.scale(image, (64, 64))
+            images[i] = image
+        return images
 
     def random_pos(self):
         r_x = random.choice([(40, 100), (1100, 1160)])
@@ -158,7 +173,7 @@ class BossEnemy(tools._BaseSprite):
         # base.set_alpha(0)
         base.set_colorkey((255, 255, 0))
         image = base.copy()
-        rotatedImage, origin = tools.rotateImage(image, self.enemyImage,
+        rotatedImage, origin = tools.rotateImage(image, self.enemyImages[self.lives],
                                                  (46, 46), (32, 32), self.angle)
         image.blit(rotatedImage, origin)
         return image
@@ -220,7 +235,12 @@ class BossEnemy(tools._BaseSprite):
     def shoot(self):
         """Intialise a bullet and shoot."""
         self.bulletManager.new(self, 'greenbullet')
-        self.bulletManager.new(self, 'greenbullet')
+
+    def got_shot(self):
+        # Boss got shot by player. Reduce lives.
+        self.lives -= 1
+        if self.lives == 0:
+            self.dead = True
 
     def check_collision_isStart(self, s1, s2):
         return s1 != s2 and s1.rect.colliderect(s2.rect)
@@ -263,7 +283,7 @@ class BossEnemy(tools._BaseSprite):
         # Randomly decide to shoot
 
         if not safe_zone:
-            print(self.shooting_timer)
+            # print(self.shooting_timer)
             self.shooting_timer -= dt
             if self.shooting_timer <= 0:
                 self.time_between_bullets -= dt
@@ -273,7 +293,7 @@ class BossEnemy(tools._BaseSprite):
                 self.time_between_bullets = 50
             elif self.bulletcounter == self.number_bullets:
                 self.bulletcounter = 0
-                self.shooting_timer = 500
+                self.shooting_timer = 1000
 
         if not (safe_zone):
             # Update velocity, acceleration and position

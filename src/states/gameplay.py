@@ -235,6 +235,7 @@ class GamePlay(tools.State):
                     if self.onBreak:
                         self.onBreak = False
                     self.timer = 3500
+
                     self.enemyManager.generate(self.enemyAI.no_to_generate())
                 self.player.update(dt)
                 self.enemyManager.update(self.player,
@@ -242,7 +243,7 @@ class GamePlay(tools.State):
                                          self.player.safe_zone, dt)
                 self.bossenemyManager.update(self.player, self.player.exact_pos[0], self.player.exact_pos[1],
                                              self.player.isMoving,
-                                             self.player.safe_zone, dtw)
+                                             self.player.safe_zone, dt)
                 self.bulletManager.update(
                     self.player, self.enemyManager, self.explosionManager)
                 self.explosionManager.update()

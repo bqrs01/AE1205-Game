@@ -30,7 +30,7 @@ import os
 import random
 from math import atan2, pi, sqrt, cos, sin
 from .. import prepare, tools
-from . import enemy, player
+from . import enemy, player, bossenemy
 
 BULLET_SIZE = (32, 32)
 CELL_SIZE = (46, 46)
@@ -62,6 +62,7 @@ class BulletManager(pg.sprite.Group):
 
         self.checkCollisionWithPlayer(player)
         self.checkCollisionWithEnemy(enemyManager, explosionManager, player)
+        self.checkCollisionWithBossEnemy(enemyManager,explosionManager,player)
 
     def checkCollisionWithPlayer(self, player):
         collisions = pg.sprite.spritecollide(
@@ -80,7 +81,22 @@ class BulletManager(pg.sprite.Group):
         # {bullet1: enemy3, bullet2: enemy4}
         for bullet in collisions:
             enemyCollided = collisions[bullet]
-            if not (type(bullet.owner) == enemy.Enemy):
+            if not (type(bullet.owner) == enemy.Enemy or type(bullet.owner) == bossenemy.BossEnemy):
+                bullet.kill()
+                # Player shot enemy successfully
+                enemyPos = enemyCollided[0].pos
+                explosionManager.new_explosion((enemyPos.x, enemyPos.y))
+                enemyCollided[0].kill()
+                player.enemy_shot()
+                # Randomly decide if powerup should appear
+                if (random.random() > 0.92):
+                    self.powerupManager.new_powerup(enemyPos)
+    def checkCollisionWithBossEnemy(self, enemyManager, explosionManager, player):
+        collisions = pg.sprite.groupcollide(self, enemyManager, False, False)
+        # {bullet1: enemy3, bullet2: enemy4}
+        for bullet in collisions:
+            enemyCollided = collisions[bullet]
+            if not (type(bullet.owner) == bossenemy.BossEnemy or type(bullet.owner) == enemy.Enemy):
                 bullet.kill()
                 # Player shot enemy successfully
                 enemyPos = enemyCollided[0].pos

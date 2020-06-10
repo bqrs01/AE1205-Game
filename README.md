@@ -15,4 +15,7 @@ To run the game, just type `python3 game.py` into a command prompt or terminal. 
 ## Sources
 Any resources used from the Internet are attributed in the ACKNOWLEDGEMENTS file.
 
+## License
+This game is licensed under The MIT License. Look at LICENSE for more information.
+
 **We hope you enjoy the game!**

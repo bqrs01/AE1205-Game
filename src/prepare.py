@@ -26,12 +26,16 @@
 """
 
 import os
+import platform
 import pygame as pg
+import ctypes
 
 from . import tools
-import ctypes
-gameid = 'com.firecraze.game.final' # arbitrary string
-ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(gameid)
+
+if platform.system() == "Windows":
+    # Workaround to display game icon in Windows Taskbar
+    gameid = 'com.firecraze.game.final'
+    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(gameid)
 
 pg.init()
 

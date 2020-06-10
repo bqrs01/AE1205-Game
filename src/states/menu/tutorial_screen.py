@@ -35,8 +35,8 @@ class TutorialScreen(tools.State):
         super(TutorialScreen, self).__init__()
         # self.images = []
         # self.gen_images()
-        self.image = pg.image.load(os.path.join(
-            os.getcwd(), "src/images/keyboard.png")).convert()
+        self.image = pg.Surface(prepare.SCREEN_SIZE)
+        self.image.fill(pg.Color('black'))
         self.rect = self.image.get_rect(center=prepare.SCREEN_CENTER)
         # Set next state
         self.next_state = "MAINSCREEN"
@@ -46,12 +46,6 @@ class TutorialScreen(tools.State):
         self.logo.set_colorkey((0, 0, 0))
         self.logo_rect = self.logo.get_rect(
             center=(prepare.SCREEN_CENTER[0], 110))
-
-        # self.sub_font = pg.font.Font(os.path.join(
-        #     os.getcwd(), "src/fonts/FORTE.TTF"), 35)
-        # self.go_back = self.sub_font.render(
-        #     "Press ESC to go back", True, pg.color.Color("green"))
-        # self.go_back_rect = self.go_back.get_rect(topleft=(85, 625))
 
         self.focused_button = False
 
@@ -63,9 +57,15 @@ class TutorialScreen(tools.State):
 
         self.f_button = pg.image.load(os.path.join(
             os.getcwd(), "src/images/arrowbutton_focused.png")).convert_alpha()
-        # self.f_button = pg.transform.scale(self.f_button, self.button_size[i])
 
         self.mousepos = (0, 0)
+
+    def startup(self, game_data):
+        pg.mixer.quit()
+        self.movie = pg.movie.Movie(os.path.join(
+            os.getcwd(), "src/video/tutorial.mpg"))
+        self.movie.set_display(self.image)
+        self.movie.play()
 
     def draw_buttons(self, surface):
         if self.focused_button:
@@ -101,7 +101,8 @@ class TutorialScreen(tools.State):
     def draw(self, surface):
         surface.blit(self.image, self.rect)
         # surface.blit(self.go_back, self.go_back_rect)
-        self.draw_buttons(surface)
+        # self.draw_buttons(surface)
 
     def update(self, dt):
-        self.check_if_focused()
+        # self.check_if_focused()
+        pass

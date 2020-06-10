@@ -37,6 +37,9 @@ vec = pg.math.Vector2
 BOSS_CHANCE = 0.50
 BOSS_INTERVAL = 1000
 
+COOLDOWN = 1500
+
+
 class GamePlay(tools.State):
     def __init__(self):
         # Call super to initialise everything needed.
@@ -289,7 +292,7 @@ class GamePlay(tools.State):
                 if (len(self.enemyManager) == 0):
                     if not self.onBreak and not self.player.safe_zone:
                         self.onBreak = True
-                        self.timer = 1500
+                        self.timer = COOLDOWN
                     if self.player.safe_zone:
                         self.onBreak = False
         else:

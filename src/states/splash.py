@@ -92,6 +92,3 @@ class SplashScreen(tools.State):
             surface.fill((44, 62, 80))
 
         surface.blit(self.image, self.rect)
-        # surface.fill(pg.Color('black'))
-        # surface.blit(self.title, self.title_rect)
-        # surface.blit(self.subtitle, self.subtitle_rect)

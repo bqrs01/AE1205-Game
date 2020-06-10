@@ -32,6 +32,13 @@ from .. import prepare, tools
 
 POWERUP_SIZE = (40, 40)
 
+BLINK_COOLDOWN = 150
+TIME_TO_BLINK = 10000
+TIME_TO_DESPAWN = 5000
+
+POWERUP_MULTIPLIER = 2.0
+POWERUP_HEALTH = 10
+
 
 class PowerupManager(pg.sprite.Group):
     def __init__(self, statsManager, *sprites):
@@ -66,9 +73,9 @@ class Powerup(tools._BaseSprite):
         self.blankImage = self.get_image(blank=True)
         self.rect = self.powerupImage.get_rect()
         self.rect.center = center_pos
-        self.time_to_blink = 10000
-        self.time_to_stop = 5000
-        self.blink_cooldown = 150
+        self.time_to_blink = TIME_TO_BLINK
+        self.time_to_despawn = TIME_TO_DESPAWN
+        self.blink_cooldown = BLINK_COOLDOWN
         self.blink_on = False
         self.soundManager = soundManager
 
@@ -94,10 +101,10 @@ class Powerup(tools._BaseSprite):
             if self.blink_cooldown <= 0:
                 self.blink_on = not self.blink_on
                 self.blink_cooldown = 150
-            if self.time_to_stop > 0:
-                self.time_to_stop -= dt
+            if self.time_to_despawn > 0:
+                self.time_to_despawn -= dt
             else:
-                # Stop blinking
+                # Stop blinking / despawn
                 self.kill()
 
         if self.blink_on:
@@ -110,11 +117,12 @@ class Powerup(tools._BaseSprite):
             if self.powerup == "x2":
                 self.soundManager.playSound(
                     'powerup.mp3', duration=4000, volumeFactor=2)
-                statsManager.set_multiplier(2.0)
+                statsManager.set_multiplier(POWERUP_MULTIPLIER)
             elif self.powerup == "infinity":
                 statsManager.set_infinity()
             elif self.powerup == "health":
                 self.soundManager.playSound(
                     'powerup.mp3', duration=4000, volumeFactor=2)
-                statsManager.addHealth(health=10)
+                statsManager.addHealth(health=POWERUP_HEALTH)
+            # Despawn
             self.kill()

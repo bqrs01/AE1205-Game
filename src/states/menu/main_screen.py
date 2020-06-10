@@ -109,9 +109,10 @@ class MainScreen(tools.State):
     def handle_event(self, event):
         if event.type == pg.QUIT:
             self.quit = True
-        # elif event.type == pg.KEYDOWN:
-        #     if event.key == pg.K_SPACE:
-        #         self.done = True
+        elif event.type == pg.KEYDOWN:
+            if event.key == pg.K_F1:
+                self.next_state = "TUTORIAL"
+                self.done = True
         elif event.type == pg.MOUSEMOTION:
             self.mousepos = event.pos
         elif event.type == pg.MOUSEBUTTONUP:

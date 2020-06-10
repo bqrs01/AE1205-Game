@@ -12,4 +12,7 @@ You must have `Python 3.8.2` installed with `pygame 2.0.0.dev10`. The game has b
 ## How to run?
 To run the game, just type `python3 game.py` into a command prompt or terminal. Ensure that you're in the correct root directory of the game before running the command.
 
-We hope you enjoy the game!
+## Sources
+Any resources used from the Internet are attributed in the ACKNOWLEDGEMENTS file.
+
+**We hope you enjoy the game!**

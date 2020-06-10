@@ -233,9 +233,9 @@ class GamePlay(tools.State):
     def update(self, dt):
         """Update function to update sprite position and graphics."""
         if self.statsManager.score >= 1000 * self.bosscounter:
-            if random.random > 0.05:
+            if random.random() > 0.05:
                 self.bossenemyManager.generate(1)
-                self.bosscounter += 1
+                self.bosscounter += 0.5
         if not self.statsManager.gameOver:
             if self.isPaused:
                 # Do not update game if paused

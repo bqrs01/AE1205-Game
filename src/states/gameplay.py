@@ -34,7 +34,7 @@ from ..components import player, enemy, bullet, explosion, powerup, bossenemy
 # Shortcut for vector
 vec = pg.math.Vector2
 
-BOSS_CHANCE = 0.50
+BOSS_CHANCE = 0.75
 BOSS_INTERVAL = 1000
 
 COOLDOWN = 1500

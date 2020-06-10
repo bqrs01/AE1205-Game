@@ -33,6 +33,17 @@ from .. import prepare, tools
 PLAYER_SIZE = (32, 32)
 CELL_SIZE = (46, 46)
 
+SPEED = 10
+
+BULLET_COOLDOWN = 300
+BULLET_COOLDOWN_INF = 50
+BULLET_COOLDOWN_SAFEZONE = 100
+
+SAFEZONE_TIME = 4000  # ms
+EXPLOSION_COOLDOWN = 500
+
+BLINK_COOLDOWN = 150
+
 
 class Player(tools._BaseSprite):
     """
@@ -52,7 +63,7 @@ class Player(tools._BaseSprite):
         self.mask = self.make_mask()
         self.direction = "right"
         self.direction_stack = []
-        self.speed = 8
+        self.speed = SPEED
         self.angle = 0
         self.target_position = (
             prepare.SCREEN_SIZE[0]//2, prepare.SCREEN_SIZE[1]//2)
@@ -61,13 +72,13 @@ class Player(tools._BaseSprite):
 
         self.safe_zone = False
         self.sz_timer = False
-        self.sz_time = 5000
+        self.sz_time = SAFEZONE_TIME
         self.blink_on = False
-        self.blink_cooldown = 150
+        self.blink_cooldown = BLINK_COOLDOWN
         self.expl_cooldown = 0
         self.canPlayerMove = True
 
-        self.bullet_cooldown = 0
+        self.bullet_cooldown = BULLET_COOLDOWN
 
         self.playerImage = pg.image.load(
             os.path.join(os.getcwd(), "src/images/redplain.png")).convert_alpha()
@@ -105,10 +116,6 @@ class Player(tools._BaseSprite):
             if direction in self.direction_stack:
                 self.direction_stack.remove(direction)
             self.direction_stack.append(direction)
-        # if key == pg.MOUSEBUTTONDOWN:
-        #     self.shoot(self)
-        # else:
-        #     print(key)
 
     def pop_direction(self, key):
         """Pop a released key from the direction stack."""
@@ -134,7 +141,7 @@ class Player(tools._BaseSprite):
         """Shoot a bullet."""
         if (self.bullet_cooldown <= 0) or (self.safe_zone):
             self.bulletManager.new(self, 'redbullet')
-            self.bullet_cooldown = 400
+            self.bullet_cooldown = BULLET_COOLDOWN
 
     def update_angle(self, position):
         # Gets position of the mouse
@@ -151,10 +158,10 @@ class Player(tools._BaseSprite):
             print("got shot. safe zone.")
             self.statsManager.reset_powerups()
             self.safe_zone = True
-            self.bullet_cooldown = 50
-            self.blink_cooldown = 150
+            self.bullet_cooldown = BULLET_COOLDOWN_SAFEZONE
+            self.blink_cooldown = BLINK_COOLDOWN
             self.sz_timer = True
-            self.sz_time = 4000
+            self.sz_time = SAFEZONE_TIME
 
     def captured(self):
         if not self.safe_zone:
@@ -162,12 +169,12 @@ class Player(tools._BaseSprite):
             print("captured. safe zone.")
             self.statsManager.reset_powerups()
             self.safe_zone = True
-            self.bullet_cooldown = 50
-            self.blink_cooldown = 150
+            self.bullet_cooldown = BULLET_COOLDOWN_SAFEZONE
+            self.blink_cooldown = BLINK_COOLDOWN
             self.canPlayerMove = False
             self.sz_timer = True
-            self.sz_time = 4000
-            self.expl_cooldown = 500
+            self.sz_time = SAFEZONE_TIME
+            self.expl_cooldown = EXPLOSION_COOLDOWN
 
             self.explosionManager.new_explosion(tuple(self.exact_pos))
 
@@ -208,7 +215,7 @@ class Player(tools._BaseSprite):
             self.expl_cooldown -= dt
             if self.blink_cooldown < 0:
                 self.blink_on = not self.blink_on
-                self.blink_cooldown = 150
+                self.blink_cooldown = BLINK_COOLDOWN
             if self.expl_cooldown < 0:
                 self.canPlayerMove = True
             if self.sz_time < 0:
@@ -224,7 +231,7 @@ class Player(tools._BaseSprite):
         else:
             if self.statsManager.infinity:
                 self.shoot()
-                self.bullet_cooldown = 60
+                self.bullet_cooldown = BULLET_COOLDOWN_INF
 
         if not (self.old_pos == self.exact_pos):
             self.isMoving = True

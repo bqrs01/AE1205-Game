@@ -43,8 +43,6 @@ class PowerupManager(pg.sprite.Group):
             self.add(Powerup(center_pos, soundManager))
         elif health:
             self.add(Powerup(center_pos, soundManager, health=True))
-        else:
-            print('there\'s already a powerup boi!')
 
     def update(self, *args):
         for powerup in self.sprites():

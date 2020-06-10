@@ -35,11 +35,13 @@ from . import enemy, player, bossenemy
 BULLET_SIZE = (32, 32)
 CELL_SIZE = (46, 46)
 
+POWERUP_CHANCE = 0.08
+HEALTH_CHANCE = 0.50
+
 
 class BulletManager(pg.sprite.Group):
     def __init__(self, soundManager, powerupManager):
         super(BulletManager, self).__init__()
-        # self.enemy_objects = []
         self.bulletImages = {}
         self.soundManager = soundManager
         self.powerupManager = powerupManager
@@ -57,6 +59,7 @@ class BulletManager(pg.sprite.Group):
         super().add(*sprites)
 
     def update(self, player, enemyManager, bossenemyManager, explosionManager, *args):
+        """Update function for bullet manager."""
         for bullet in self.sprites():
             bullet.update(*args)
 
@@ -66,6 +69,7 @@ class BulletManager(pg.sprite.Group):
             bossenemyManager, explosionManager, player)
 
     def checkCollisionWithPlayer(self, player):
+        """Check bullet collison with player."""
         collisions = pg.sprite.spritecollide(
             player, self, False)
 
@@ -74,10 +78,9 @@ class BulletManager(pg.sprite.Group):
             if not (c_with_pl and bullet.owner == player):
                 bullet.kill()
                 player.got_shot()
-                # print("You got shot!")
-                # Keep score....
 
     def checkCollisionWithEnemy(self, enemyManager, explosionManager, player):
+        """Check bullet collison with enemy."""
         collisions = pg.sprite.groupcollide(self, enemyManager, False, False)
         for bullet in collisions:
             enemyCollided = collisions[bullet]
@@ -89,11 +92,12 @@ class BulletManager(pg.sprite.Group):
                 enemyCollided[0].kill()
                 player.enemy_shot()
                 # Randomly decide if powerup should appear
-                if (random.random() > 0.92):
+                if (random.random() <= POWERUP_CHANCE):
                     self.powerupManager.new_powerup(
                         enemyPos, self.soundManager)
 
     def checkCollisionWithBossEnemy(self, enemyManager, explosionManager, player):
+        """Check bullet collison with boss enemy."""
         collisions = pg.sprite.groupcollide(self, enemyManager, False, False)
         for bullet in collisions:
             enemyCollided = collisions[bullet]
@@ -106,21 +110,12 @@ class BulletManager(pg.sprite.Group):
                     explosionManager.new_explosion((enemyPos.x, enemyPos.y))
                     enemyCollided[0].kill()
 
-                    if (random.random() > 0.50):
+                    # Randomly decide if powerup should appear
+                    if (random.random() <= HEALTH_CHANCE):
                         self.powerupManager.new_powerup(
                             enemyPos, self.soundManager, health=True)
 
                 player.enemy_shot()
-                # Randomly decide if powerup should appear
-
-    # def checkIfCollidedIsPlayer(self, player, bullet):
-    #     if bullet.owner == player:
-    #         print('player bullet')
-    #         return False
-    #     elif type(bullet.owner) == enemy.Enemy:
-    #         print('enemy bullet')
-    #         return False
-    #     return False
 
     def new(self, owner, colour):
         image = self.load_image(colour)
@@ -134,8 +129,6 @@ class BulletManager(pg.sprite.Group):
 
     def remove(self, *sprites):
         super(BulletManager, self).remove(*sprites)
-        # for sprite in sprites:
-        #     self.enemy_objects.remove(sprite)
 
 
 class Bullet(tools._BaseSprite):
@@ -167,12 +160,11 @@ class Bullet(tools._BaseSprite):
         self.angle2 = (dis.direction * 180 / pi)  # For movement
         self.movement = False
 
-        # self.bulletImage = pg.image.load(
-        # os.path.join(os.getcwd(), f"src/images/{colour}.png"))
         self.bulletImage = pg.transform.scale(image, (32, 32))
         self.image = self.make_image(self.bulletImage)
 
     def make_image(self, imageA):
+        """Make image for blitting."""
         base = pg.Surface(CELL_SIZE).convert()
         base.fill((255, 255, 0))
         base.set_colorkey((255, 255, 0))
@@ -182,14 +174,15 @@ class Bullet(tools._BaseSprite):
         image.blit(rotatedImage, origin)
         return image
 
-    def make_mask(self):
-        """Create a collision mask for the bullet."""
-        temp = pg.Surface(CELL_SIZE).convert_alpha()
-        temp.fill((0, 0, 0, 0))
-        temp.fill(pg.Color("white"), (10, 20, 30, 30))
-        return pg.mask.from_surface(temp)
+    # def make_mask(self):
+    #     """Create a collision mask for the bullet."""
+    #     temp = pg.Surface(CELL_SIZE).convert_alpha()
+    #     temp.fill((0, 0, 0, 0))
+    #     temp.fill(pg.Color("white"), (10, 20, 30, 30))
+    #     return pg.mask.from_surface(temp)
 
     def checkOutOfBounds(self):
+        """Check if bullet is out of window."""
         right = prepare.SCREEN_SIZE[0] - ((self.rect.width) / 2)
         bottom = prepare.SCREEN_SIZE[1] - (self.rect.height / 2)
 
@@ -201,22 +194,12 @@ class Bullet(tools._BaseSprite):
         else:
             pass
 
-    # def rot_center(self, image, angle):
-    #     self.angle = angle
-    #     center = image.get_rect().center
-    #     rotated_image = pg.transform.rotate(image, angle)
-    #     new_rect = rotated_image.get_rect(center=center)
-    #     return rotated_image, new_rect
-
     def move(self):
         """Move the bullet."""
-        # vector = tools.Vector(self.speed, self.angle * pi/180)
-        # print(self.angle)
-        # self.speed * cos(self.angle * pi/180)
         self.exact_pos[0] += self.speed * \
-            cos(self.angle2 * pi / 180)  # vector.getComponents()[0]
+            cos(self.angle2 * pi / 180)
         self.exact_pos[1] += self.speed * \
-            -sin(self.angle2 * pi / 180)  # vector.getComponents()[1]
+            -sin(self.angle2 * pi / 180)
 
     def update(self, *args):
         """Updates player every frame."""

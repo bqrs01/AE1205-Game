@@ -270,8 +270,7 @@ class Game(object):
         except TypeError:
             self.setup_data(force=True)
 
-    # def get_highscore(self):
-    #     return self.highscore
+
 
     def set_highscore(self, newHighscore):
         self.highscore = newHighscore
@@ -482,8 +481,6 @@ class Slider(_BaseSprite):
 
     def setup(self):
         self.image = pg.Surface((204, 20), pg.SRCALPHA).convert_alpha()
-        # self.image.fill((255, 255, 0))
-        # self.image.set_colorkey((255, 255, 0))
 
         # Outer rect
         pg.draw.rect(self.image, pg.color.Color(

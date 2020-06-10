@@ -42,16 +42,17 @@ MAX_FORCE = 0.1
 class BossEnemyManager(pg.sprite.Group):
     def __init__(self, bulletManager):
         super(BossEnemyManager, self).__init__()
-        # self.enemy_objects = []
         self.bulletManager = bulletManager
 
     def update(self, player, *args):
+        """ Updates all the bossenemies """
         for enemy in self.sprites():
             self.collided(enemy)
             self.checkCollisionWithPlayer(player)
             enemy.update(*args)
 
     def checkCollisionWithPlayer(self, player):
+        """Checks if it collides with the player"""
         if not player.safe_zone:
             collisions = pg.sprite.spritecollide(
                 player, self, False)
@@ -60,13 +61,6 @@ class BossEnemyManager(pg.sprite.Group):
                 player.captured()
             for enemy in collisions:
                 enemy.kill()
-
-        # for enemy in collisions:
-        #     c_with_pl = pg.sprite.collide_rect(player, enemy)
-        #     if not (c_with_pl and bullet.owner == player):
-
-        # print("You got shot!")
-        # Keep score....
 
     def collided(self, spriteC):
         for sprite in self.sprites():
@@ -77,8 +71,6 @@ class BossEnemyManager(pg.sprite.Group):
                 B_y = spriteC.rect.y
                 A_to_B = vec((B_x - A_x, B_y - A_y))
                 A_to_B.rotate_ip(180)
-                # reverse = tools.Vector(
-                #     30, tools.Vector.getReverseDirection(A_to_B))
                 magnitude = sprite.vel.magnitude()
                 if magnitude != 0:
                     try:
@@ -89,7 +81,6 @@ class BossEnemyManager(pg.sprite.Group):
                         pass
 
     def generate(self, number=1):
-        # Limit to only one at a given time.
         if not len(self) > 0:
             self.add(BossEnemy(self.bulletManager, self))
 
@@ -99,8 +90,6 @@ class BossEnemyManager(pg.sprite.Group):
 
     def remove(self, *sprites):
         super(BossEnemyManager, self).remove(*sprites)
-        # for sprite in sprites:
-        #     self.enemy_objects.remove(sprite)
 
 
 class BossEnemy(tools._BaseSprite):
@@ -113,7 +102,6 @@ class BossEnemy(tools._BaseSprite):
 
         tools._BaseSprite.__init__(
             self, (x, y), CELL_SIZE, *groups)
-        # self.controls = prepare.DEFAULT_CONTROLS
 
         self.bulletManager = bulletManager
 
@@ -136,10 +124,6 @@ class BossEnemy(tools._BaseSprite):
         self.target_position_t = (x, y)
         self.capture_position_now = False
         self.capture_position_time = 0
-
-        # self.enemyImage = pg.image.load(
-        #     os.path.join(os.getcwd(), "src/images/greenplain.png")).convert_alpha()
-        # self.enemyImage = pg.transform.scale(self.enemyImage, (64, 64))
 
         self.lives = 10
         self.dead = False
@@ -200,6 +184,7 @@ class BossEnemy(tools._BaseSprite):
             self.pos.y = bottom
 
     def rot_center(self, image, angle):
+        """ Used in order to correctly rotate the image"""
         center = image.get_rect().center
         rotated_image = pg.transform.rotate(image, angle)
         new_rect = rotated_image.get_rect(center=center)
@@ -211,6 +196,7 @@ class BossEnemy(tools._BaseSprite):
                            (target.x - self.pos.x)) * 180 / pi - 90
 
     def seek(self, target):
+        """Steer towards the player"""
         self.desired = (target - self.pos)
         dist = self.desired.length()
         self.desired.normalize_ip()
@@ -238,7 +224,7 @@ class BossEnemy(tools._BaseSprite):
         self.bulletManager.new(self, 'greenbullet')
 
     def got_shot(self):
-        # Boss got shot by player. Reduce lives.
+        """Boss got shot by player. Reduce lives."""
         self.lives -= 1
         if self.lives == 0:
             self.dead = True
@@ -252,18 +238,9 @@ class BossEnemy(tools._BaseSprite):
         self.target = vec(playerx, playery)
 
         if self.isStart:
-            # Check if enemy is close to player at start
             while True:
                 pos = vec(self.rect.x, self.rect.y)
                 dist = (self.target - pos)
-                # try:
-                #     any_collided = pg.sprite.spritecollideany(
-                #         self, self.groups()[0], collided=self.check_collision_isStart)
-                # except IndexError:
-
-                #     print('1', self.groups())
-                #     any_collided = pg.sprite.spritecollideany(
-                #         self, self.groups()[0], collided=self.check_collision_isStart)
 
                 if dist.magnitude() <= 500:
                     self.rect.x = random.randint(
@@ -284,7 +261,6 @@ class BossEnemy(tools._BaseSprite):
         # Randomly decide to shoot
 
         if not safe_zone:
-            # print(self.shooting_timer)
             self.shooting_timer -= dt
             if self.shooting_timer <= 0:
                 self.time_between_bullets -= dt
@@ -300,6 +276,5 @@ class BossEnemy(tools._BaseSprite):
             # Update velocity, acceleration and position
             self.move(self.target)
 
-        # self.checkOutOfBounds()
         self.image = self.make_image()
         self.rect.center = self.pos

@@ -38,6 +38,10 @@ MAX_SPEED = 5
 APPROACH_RADIUS = 100
 MAX_FORCE = 0.1
 
+NUMBER_BULLETS = 6
+SHOOTING_INTERVAL = 1000
+TIME_BETWEEN_BULLETS = 50
+
 
 class BossEnemyManager(pg.sprite.Group):
     def __init__(self, bulletManager):
@@ -105,7 +109,6 @@ class BossEnemy(tools._BaseSprite):
 
         self.bulletManager = bulletManager
 
-        # self.mask = self.make_mask()
         self.direction = "right"
         self.direction_stack = []
 
@@ -131,10 +134,10 @@ class BossEnemy(tools._BaseSprite):
         self.enemyImages = self.generate_images()
         self.image = self.make_image()
 
-        self.shooting_timer = 500
-        self.time_between_bullets = 50
-        self.bulletcounter = 6
-        self.number_bullets = 6
+        self.shooting_timer = SHOOTING_INTERVAL
+        self.time_between_bullets = TIME_BETWEEN_BULLETS
+        self.number_bullets = NUMBER_BULLETS
+        self.bulletcounter = self.number_bullets
 
     def generate_images(self):
         images = {}
@@ -162,13 +165,6 @@ class BossEnemy(tools._BaseSprite):
                                                  (46, 46), (32, 32), self.angle)
         image.blit(rotatedImage, origin)
         return image
-
-    # def make_mask(self):
-    #     """Create a collision mask for the enemy."""
-    #     temp = pg.Surface(CELL_SIZE).convert_alpha()
-    #     temp.fill((0, 0, 0, 0))
-    #     temp.fill(pg.Color("white"), (10, 20, 30, 30))
-    #     return pg.mask.from_surface(temp)
 
     def checkOutOfBounds(self):
         right = prepare.SCREEN_SIZE[0] - ((self.rect.width) / 2)
@@ -258,8 +254,6 @@ class BossEnemy(tools._BaseSprite):
         self.old_pos = self.pos
         self.update_angle(self.target)
 
-        # Randomly decide to shoot
-
         if not safe_zone:
             self.shooting_timer -= dt
             if self.shooting_timer <= 0:
@@ -267,10 +261,10 @@ class BossEnemy(tools._BaseSprite):
             if self.shooting_timer <= 0 and self.time_between_bullets <= 0 and self.bulletcounter < self.number_bullets:
                 self.bulletcounter += 1
                 self.shoot()
-                self.time_between_bullets = 50
+                self.time_between_bullets = TIME_BETWEEN_BULLETS
             elif self.bulletcounter == self.number_bullets:
                 self.bulletcounter = 0
-                self.shooting_timer = 1000
+                self.shooting_timer = SHOOTING_INTERVAL
 
         if not (safe_zone):
             # Update velocity, acceleration and position

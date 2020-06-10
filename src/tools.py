@@ -216,6 +216,7 @@ class Game(object):
         self.set_state()
         self.state.startup({})
 
+    # The following functions are for data saving...
     def setup_data(self, force=False):
         basedir = os.path.dirname(os.path.join(os.getcwd(), f"src/data/"))
         if not os.path.exists(basedir):

@@ -232,10 +232,10 @@ class GamePlay(tools.State):
 
     def update(self, dt):
         """Update function to update sprite position and graphics."""
-        if self.statsManager.score >= 1000 * self.bosscounter:
+        if self.statsManager.score >= 200 * self.bosscounter:
             if random.random() > 0.05:
                 self.bossenemyManager.generate(1)
-                self.bosscounter += 0.5
+                self.bosscounter += 1
         if not self.statsManager.gameOver:
             if self.isPaused:
                 # Do not update game if paused
@@ -400,7 +400,7 @@ class StatsManager():
         # print(f"Score: {self.score}")
 
     def addHealth(self, health=10):
-        health = max(self.health + health, 50)
+        health = min(self.health + health, 50)
         self.health = health
 
     def dropHealth(self, dropBy=10):

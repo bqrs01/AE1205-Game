@@ -40,7 +40,9 @@ class PowerupManager(pg.sprite.Group):
 
     def new_powerup(self, center_pos, health=False):
         if (len(self) == 0) and (not self.statsManager.powerup_active) and (self.statsManager.cooldown <= 0):
-            self.add(Powerup(center_pos, health=health))
+            self.add(Powerup(center_pos))
+        elif health:
+            self.add(Powerup(center_pos, health=True))
         else:
             print('there\'s already a powerup boi!')
 
@@ -61,6 +63,7 @@ class Powerup(tools._BaseSprite):
         else:
             self.powerupImage = pg.image.load(os.path.join(
                 os.getcwd(), f"src/images/powerup_heart.png")).convert_alpha()
+            self.powerupImage = pg.transform.scale(self.powerupImage, (40, 40))
             self.powerup = "health"
         self.blankImage = self.get_image(blank=True)
         self.rect = self.powerupImage.get_rect()

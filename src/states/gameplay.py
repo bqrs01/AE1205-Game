@@ -207,11 +207,15 @@ class GamePlay(tools.State):
         self.enemyAI = enemy.EnemyAI(self.statsManager)
         self.player = player.Player(
             self.bulletManager, self.statsManager, self.explosionManager)
-        self.isStart = True
+
         self.current_song = self.sub_font_2.render(
             f"Song: {self.bgmusic['song_name']}", True, pg.color.Color('yellow'))
         self.current_song_rect = self.current_song.get_rect(
             bottomleft=(15, 690))
+
+        self.score_message = self.sub_font.render(
+            "Score: 0", True, pg.Color('black'))
+        self.score_message_rect = self.score_message.get_rect(topleft=(5, 10))
 
         self.highscore_text = self.sub_font_2.render(
             f"Highscore: {self.highscore['get_highscore']()}", True, pg.color.Color('yellow'))
@@ -225,10 +229,9 @@ class GamePlay(tools.State):
 
         self.last_update = pg.time.get_ticks()
 
+        self.isStart = True
         self.isEnd = False
         self.isPaused = False
-
-        print("Highscore:", self.highscore["get_highscore"]())
 
     def update(self, dt):
         """Update function to update sprite position and graphics."""

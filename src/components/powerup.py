@@ -38,11 +38,11 @@ class PowerupManager(pg.sprite.Group):
         super().__init__(*sprites)
         self.statsManager = statsManager
 
-    def new_powerup(self, center_pos, health=False):
+    def new_powerup(self, center_pos, soundManager, health=False):
         if (len(self) == 0) and (not self.statsManager.powerup_active) and (self.statsManager.cooldown <= 0):
-            self.add(Powerup(center_pos))
+            self.add(Powerup(center_pos, soundManager))
         elif health:
-            self.add(Powerup(center_pos, health=True))
+            self.add(Powerup(center_pos, soundManager, health=True))
         else:
             print('there\'s already a powerup boi!')
 
@@ -56,7 +56,7 @@ class PowerupManager(pg.sprite.Group):
 
 
 class Powerup(tools._BaseSprite):
-    def __init__(self, center_pos, health=False):
+    def __init__(self, center_pos, soundManager, health=False):
         super().__init__(center_pos, (75, 75))
         if not health:
             self.powerupImage, self.powerup = self.get_image()
@@ -72,6 +72,7 @@ class Powerup(tools._BaseSprite):
         self.time_to_stop = 5000
         self.blink_cooldown = 150
         self.blink_on = False
+        self.soundManager = soundManager
 
     def get_image(self, blank=False):
         if blank:
@@ -109,9 +110,13 @@ class Powerup(tools._BaseSprite):
         collision = pg.sprite.collide_rect(player, self)
         if collision:
             if self.powerup == "x2":
+                self.soundManager.playSound(
+                    'powerup.mp3', duration=4000, volumeFactor=2)
                 statsManager.set_multiplier(2.0)
             elif self.powerup == "infinity":
                 statsManager.set_infinity()
             elif self.powerup == "health":
+                self.soundManager.playSound(
+                    'powerup.mp3', duration=4000, volumeFactor=2)
                 statsManager.addHealth(health=10)
             self.kill()

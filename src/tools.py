@@ -91,13 +91,12 @@ class SoundManager:
             self.setup_data(force=True)
             return self.set_data(filename, object)
 
-    def playSound(self, filename, duration):
-        # print(pg.mixer.get_init())
-        # soundfile = io.BufferedReader(open(os.path.join(
-        #     os.getcwd(), f"src/soundeffects/{filename}"), "rb", buffering=0))
+    def playSound(self, filename, duration, volumeFactor=1.0):
         sound = pg.mixer.Sound(file=(os.path.join(
             os.getcwd(), f"src/soundeffects/{filename}")))
-        sound.set_volume(self.volume)
+        volume = max(self.volume * volumeFactor, 0.0)
+        volume = min(self.volume * volumeFactor, 1.0)
+        sound.set_volume(volume)
         sound.play(maxtime=duration)
         self.sounds.append({"name": filename, "sound": sound})
 

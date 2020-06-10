@@ -224,7 +224,7 @@ class Player(tools._BaseSprite):
         else:
             if self.statsManager.infinity:
                 self.shoot()
-                self.bullet_cooldown = 50
+                self.bullet_cooldown = 60
 
         if not (self.old_pos == self.exact_pos):
             self.isMoving = True

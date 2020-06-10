@@ -90,7 +90,8 @@ class BulletManager(pg.sprite.Group):
                 player.enemy_shot()
                 # Randomly decide if powerup should appear
                 if (random.random() > 0.92):
-                    self.powerupManager.new_powerup(enemyPos)
+                    self.powerupManager.new_powerup(
+                        enemyPos, self.soundManager)
 
     def checkCollisionWithBossEnemy(self, enemyManager, explosionManager, player):
         collisions = pg.sprite.groupcollide(self, enemyManager, False, False)
@@ -106,7 +107,8 @@ class BulletManager(pg.sprite.Group):
                     enemyCollided[0].kill()
 
                     if (random.random() > 0.50):
-                        self.powerupManager.new_powerup(enemyPos, health=True)
+                        self.powerupManager.new_powerup(
+                            enemyPos, self.soundManager, health=True)
 
                 player.enemy_shot()
                 # Randomly decide if powerup should appear

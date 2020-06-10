@@ -368,7 +368,7 @@ class StatsManager():
     def reset_multiplier(self):
         self.multiplier = 1.0
         self.powerup_active = False
-        self.startCooldown()
+        self.startCooldown(afterPowerup=True)
 
     def set_infinity(self, resetAfter=15):
         """Set infinity on temporarily. Useful for powerup."""
@@ -380,7 +380,7 @@ class StatsManager():
     def reset_infinity(self):
         self.infinity = False
         self.powerup_active = False
-        self.startCooldown()
+        self.startCooldown(afterPowerup=True)
 
     def reset_powerups(self):
         """Reset powerups."""
@@ -388,6 +388,7 @@ class StatsManager():
         self.multiplier = 1.0
         self.powerup_active = False
         self.powerup_active_name = ""
+        self.startCooldown()
 
     def addKill(self):
         """Add kills to tally."""
@@ -405,8 +406,12 @@ class StatsManager():
             self.health = 0
             threading.Timer(0.5, self.declareGameOver).start()
 
-    def startCooldown(self):
-        self.cooldown = 15000
+    def startCooldown(self, afterPowerup=False):
+        if self.cooldown <= 0:
+            if afterPowerup:
+                self.cooldown = 30000
+            else:
+                self.cooldown = 5000
 
     def declareGameOver(self):
         """Declare game over."""

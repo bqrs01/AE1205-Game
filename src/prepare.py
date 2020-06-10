@@ -32,8 +32,8 @@ import platform
 from . import tools
 
 if platform.system() == "Windows":
-    import ctypes
     # Workaround to display game icon in Windows Taskbar
+    import ctypes
     gameid = 'com.firecraze.game.final'
     ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(gameid)
 

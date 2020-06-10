@@ -29,6 +29,8 @@ import pygame as pg
 import os
 from .. import prepare, tools
 
+FRAME_RATE = 50
+
 
 class ExplosionManager(pg.sprite.Group):
     def __init__(self, *sprites):
@@ -62,7 +64,7 @@ class Explosion(tools._BaseSprite):
         self.rect.center = center_pos
         self.frame_num = 0
         self.last_update = pg.time.get_ticks()
-        self.frame_rate = 50
+        self.frame_rate = FRAME_RATE
 
     def update(self):
         now = pg.time.get_ticks()

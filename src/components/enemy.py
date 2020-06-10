@@ -40,6 +40,7 @@ MAX_FORCE = 0.1
 
 
 class EnemyAI():
+    """ Gets the game more difficult as you kill more enemies"""
     def __init__(self, statsManager):
         self.statsManager = statsManager
         self.diff_val = [2, 3, 5, 7, 8, 9]
@@ -57,7 +58,6 @@ class EnemyAI():
 class EnemyManager(pg.sprite.Group):
     def __init__(self, bulletManager):
         super(EnemyManager, self).__init__()
-        # self.enemy_objects = []
         self.bulletManager = bulletManager
 
     def update(self, player, *args):
@@ -76,12 +76,7 @@ class EnemyManager(pg.sprite.Group):
             for enemy in collisions:
                 enemy.kill()
 
-        # for enemy in collisions:
-        #     c_with_pl = pg.sprite.collide_rect(player, enemy)
-        #     if not (c_with_pl and bullet.owner == player):
 
-            # print("You got shot!")
-            # Keep score....
 
     def collided(self, spriteC):
         for sprite in self.sprites():
@@ -92,8 +87,6 @@ class EnemyManager(pg.sprite.Group):
                 B_y = spriteC.rect.y
                 A_to_B = vec((B_x-A_x, B_y-A_y))
                 A_to_B.rotate_ip(180)
-                # reverse = tools.Vector(
-                #     30, tools.Vector.getReverseDirection(A_to_B))
                 magnitude = sprite.vel.magnitude()
                 if magnitude != 0:
                     try:
@@ -104,7 +97,6 @@ class EnemyManager(pg.sprite.Group):
                         pass
 
     def generate(self, number=1):
-        # print(len(self))
         if (len(self) + number) <= 8:
             for _ in range(number):
                 self.add(Enemy(self.bulletManager))
@@ -118,8 +110,6 @@ class EnemyManager(pg.sprite.Group):
 
     def remove(self, *sprites):
         super(EnemyManager, self).remove(*sprites)
-        # for sprite in sprites:
-        #     self.enemy_objects.remove(sprite)
 
 
 class Enemy(tools._BaseSprite):
@@ -132,7 +122,6 @@ class Enemy(tools._BaseSprite):
 
         tools._BaseSprite.__init__(
             self, (x, y), CELL_SIZE, *groups)
-        # self.controls = prepare.DEFAULT_CONTROLS
 
         self.bulletManager = bulletManager
 
@@ -171,7 +160,6 @@ class Enemy(tools._BaseSprite):
     def make_image(self, d):
         base = pg.Surface(CELL_SIZE, pg.SRCALPHA).convert()
         base.fill((255, 255, 0))
-        # base.set_alpha(0)
         base.set_colorkey((255, 255, 0))
         image = base.copy()
         rotatedImage, origin = tools.rotateImage(image, self.enemyImage,
@@ -199,14 +187,8 @@ class Enemy(tools._BaseSprite):
         elif self.pos.y > bottom:
             self.pos.y = bottom
 
-    # def update_angle(self, position):
-    #     # Gets position of the mouse
-    #     playerx, playery = position
-    #     # To calculate the angle
-    #     self.angle = atan2(-(playerx -
-    #                          self.rect.center[1]), (playery - self.rect.center[0])) * 180 / pi
-
     def rot_center(self, image, angle):
+        """ Function to correctly rotate the center of the sprite (to seek player)"""
         center = image.get_rect().center
         rotated_image = pg.transform.rotate(image, angle)
         new_rect = rotated_image.get_rect(center=center)
@@ -218,6 +200,7 @@ class Enemy(tools._BaseSprite):
                            (target.x - self.pos.x)) * 180 / pi - 90
 
     def seek(self, target):
+        """Steers towards the player"""
         self.desired = (target - self.pos)
         dist = self.desired.length()
         self.desired.normalize_ip()

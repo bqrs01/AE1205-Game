@@ -28,7 +28,7 @@
 
 from . import prepare, tools
 from .states import splash, gameplay, gameover
-from .states.menu import main_screen, settings, controls_screen
+from .states.menu import main_screen, settings, controls_screen, tutorial_screen
 
 
 def main():
@@ -41,7 +41,9 @@ def main():
         "GAMEOVER": gameover.GameOver(),
         "MAINSCREEN": main_screen.MainScreen(),
         "CONTROLS": controls_screen.ControlsScreen(),
-        "SETTINGS": settings.SettingsScreen()}
+        "SETTINGS": settings.SettingsScreen(),
+        "TUTORIAL": tutorial_screen.TutorialScreen()
+    }
 
     game = tools.Game(screen, caption, states, "SPLASH")
     game.run()

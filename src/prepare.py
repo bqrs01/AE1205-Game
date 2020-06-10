@@ -29,7 +29,9 @@ import os
 import pygame as pg
 
 from . import tools
-
+import ctypes
+gameid = 'com.firecraze.game.final' # arbitrary string
+ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(gameid)
 
 pg.init()
 
@@ -38,7 +40,7 @@ SCREEN_CENTER = (600, 350)
 ORIGINAL_CAPTION = "Firecraze (by Mario and Bryan)"
 ORIGINAL_ICON_FILENAME = "redplain.png"
 
-STARTING_POS = (SCREEN_SIZE[0]//2, SCREEN_SIZE[1]//2)
+STARTING_POS = (SCREEN_SIZE[0] // 2, SCREEN_SIZE[1] // 2)
 
 DEFAULT_CONTROLS = {
     pg.K_a: "left",
@@ -55,10 +57,14 @@ DIRECT_DICT = {"down": (0, 1),
 
 pg.display.set_caption(ORIGINAL_CAPTION)
 
+
 _screen = pg.display.set_mode(SCREEN_SIZE)
+
 icon = pg.image.load(os.path.join(
     os.getcwd(), f"src/images/{ORIGINAL_ICON_FILENAME}")).convert_alpha()
+icon = pg.transform.scale(icon, (31, 32))
 pg.display.set_icon(icon)
+
 pg.display.update()
 
 

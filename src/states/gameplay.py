@@ -399,6 +399,10 @@ class StatsManager():
         self.score += int(points * self.multiplier)
         # print(f"Score: {self.score}")
 
+    def addHealth(self, health=10):
+        health = max(self.health + health, 50)
+        self.health = health
+
     def dropHealth(self, dropBy=10):
         """Reduce player's health."""
         self.health -= dropBy

@@ -38,9 +38,9 @@ class PowerupManager(pg.sprite.Group):
         super().__init__(*sprites)
         self.statsManager = statsManager
 
-    def new_powerup(self, center_pos):
+    def new_powerup(self, center_pos, health=False):
         if (len(self) == 0) and (not self.statsManager.powerup_active) and (self.statsManager.cooldown <= 0):
-            self.add(Powerup(center_pos))
+            self.add(Powerup(center_pos, health=health))
         else:
             print('there\'s already a powerup boi!')
 
@@ -54,9 +54,14 @@ class PowerupManager(pg.sprite.Group):
 
 
 class Powerup(tools._BaseSprite):
-    def __init__(self, center_pos):
+    def __init__(self, center_pos, health=False):
         super().__init__(center_pos, (75, 75))
-        self.powerupImage, self.powerup = self.get_image()
+        if not health:
+            self.powerupImage, self.powerup = self.get_image()
+        else:
+            self.powerupImage = pg.image.load(os.path.join(
+                os.getcwd(), f"src/images/powerup_heart.png")).convert_alpha()
+            self.powerup = "health"
         self.blankImage = self.get_image(blank=True)
         self.rect = self.powerupImage.get_rect()
         self.rect.center = center_pos
@@ -104,4 +109,6 @@ class Powerup(tools._BaseSprite):
                 statsManager.set_multiplier(2.0)
             elif self.powerup == "infinity":
                 statsManager.set_infinity()
+            elif self.powerup == "health":
+                statsManager.addHealth(health=10)
             self.kill()

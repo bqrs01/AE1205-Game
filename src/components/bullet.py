@@ -105,8 +105,9 @@ class BulletManager(pg.sprite.Group):
                     explosionManager.new_explosion((enemyPos.x, enemyPos.y))
                     enemyCollided[0].kill()
 
-                    if (random.random() > 0.92):
-                        self.powerupManager.new_powerup(enemyPos)
+                    if (random.random() > 0.50):
+                        self.powerupManager.new_powerup(enemyPos, health=True)
+
                 player.enemy_shot()
                 # Randomly decide if powerup should appear
 

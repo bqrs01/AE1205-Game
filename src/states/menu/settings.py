@@ -33,8 +33,6 @@ class SettingsScreen(tools.State):
     def __init__(self):
         # Call super to initialise everything needed
         super(SettingsScreen, self).__init__()
-        # self.images = []
-        # self.gen_images()
         self.image = pg.image.load(os.path.join(
             os.getcwd(), "src/images/mainscreenbg.png")).convert()
         self.rect = self.image.get_rect(center=prepare.SCREEN_CENTER)
@@ -67,21 +65,18 @@ class SettingsScreen(tools.State):
         self.sfx_lbl_rect = self.sfx_lbl.get_rect(
             topleft=(400, 370))
 
-        self.focused_button = False
-
-        self.button = pg.image.load(os.path.join(
-            os.getcwd(), "src/images/arrowbutton_unfocused.png")).convert_alpha()
-        # self.button = pg.transform.scale(button, (40, 20))
-        self.button_rect = self.button.get_rect(
-            center=(40, 40))
-
-        self.f_button = pg.image.load(os.path.join(
-            os.getcwd(), "src/images/arrowbutton_focused.png")).convert_alpha()
-        # self.f_button = pg.transform.scale(self.f_button, self.button_size[i])
-
         self.bgmusic = {}
 
-        # self.startup()
+        self.button_names = ["arrowbutton", "introbutton"]
+        self.button_pos = [(40, 40), (600, 500)]
+        self.button_size = [(40, 20), (150, 45)]
+        self.button_states = ["MAINSCREEN", "TUTORIAL"]
+        self.buttons = []
+        self.buttons_focused = []
+        self.buttons_rects = []
+        self.focused_button = -1
+
+        self.get_button_images()
 
     def startup(self, game_data):
         self.mousepos = (0, 0)
@@ -99,8 +94,34 @@ class SettingsScreen(tools.State):
         self.focused_slider = -1
         self.isMouseDown = False
 
+    def get_button_images(self):
+        for i, name in enumerate(self.button_names):
+            button = pg.image.load(os.path.join(
+                os.getcwd(), f"src/images/{name}_unfocused.png")).convert_alpha()
+            button = pg.transform.scale(button, self.button_size[i])
+            button_rect = button.get_rect(
+                center=self.button_pos[i])
+            self.buttons.append(button)
+            self.buttons_rects.append(button_rect)
+
+            f_button = pg.image.load(os.path.join(
+                os.getcwd(), f"src/images/{name}_focused.png")).convert_alpha()
+            f_button = pg.transform.scale(f_button, self.button_size[i])
+            self.buttons_focused.append(f_button)
+
+    def draw_buttons(self, surface):
+        for i, button in enumerate(self.buttons):
+            if self.focused_button == i:
+                surface.blit(self.buttons_focused[i], self.buttons_rects[i])
+            else:
+                surface.blit(button, self.buttons_rects[i])
+
+    def button_selected(self):
+        if self.focused_button != -1:
+            self.next_state = self.button_states[self.focused_button]
+            self.done = True
+
     def on_music_change(self, new_value):
-        # print("MUSIC", new_value)
         self.bgmusic['set_volume'](new_value)
         self.bgmusic['save_volume']()
 
@@ -111,28 +132,19 @@ class SettingsScreen(tools.State):
         self.soundManager = tools.SoundManager('prefs.json')
         self.soundManager.playSound('laser.wav', duration=225)
 
-    def draw_buttons(self, surface):
-        if self.focused_button:
-            surface.blit(self.f_button, self.button_rect)
-        else:
-            surface.blit(self.button, self.button_rect)
-
-    def button_selected(self):
-        if self.focused_button:
-            # Saves volume
-            self.bgmusic['save_volume']()
-            self.next_state = "MAINSCREEN"
-            self.done = True
-
-    def check_if_button_focused(self):
-        x = self.mousepos[0]
-        y = self.mousepos[1]
-        button_rect = self.button_rect
-        if button_rect.collidepoint(x, y):
-            # Button is focused.
-            self.focused_button = True
-        else:
-            self.focused_button = False
+    def check_if_buttons_focused(self):
+        focus_happened = False
+        for idx in range(len(self.buttons)):
+            x = self.mousepos[0]
+            y = self.mousepos[1]
+            button_rect = self.buttons_rects[idx]
+            if button_rect.collidepoint(x, y):
+                # Button is focused.
+                self.focused_button = idx
+                focus_happened = True
+                break
+        if not focus_happened:
+            self.focused_button = -1
 
     def check_if_sliders_focused(self):
         focus_happened = False
@@ -179,5 +191,5 @@ class SettingsScreen(tools.State):
         self.draw_sliders(surface)
 
     def update(self, dt):
-        self.check_if_button_focused()
+        self.check_if_buttons_focused()
         self.check_if_sliders_focused()

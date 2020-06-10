@@ -210,6 +210,12 @@ class Game(object):
 
         self.highscore = self.get_highscore()
 
+        self.intro_done = self.get_intro_done()
+
+        # Initialise first state and call startup!
+        self.set_state()
+        self.state.startup({})
+
     def setup_data(self, force=False):
         basedir = os.path.dirname(os.path.join(os.getcwd(), f"src/data/"))
         if not os.path.exists(basedir):
@@ -221,6 +227,22 @@ class Game(object):
                 f = open(path, 'w')
                 f.write('{}')
                 f.close()
+
+    def get_intro_done(self):
+        data = self.get_data('prefs.json')
+        try:
+            if not "intro_done" in data:
+                data['intro_done'] = False
+                self.set_data('prefs.json', data)
+            return (data['intro_done'])
+        except TypeError:
+            self.setup_data(force=True)
+            return False
+
+    def set_intro_done(self, newValue):
+        data = self.get_data('prefs.json')
+        data['intro_done'] = newValue
+        self.set_data('prefs.json', data)
 
     def get_data(self, filename):
         try:
@@ -335,6 +357,9 @@ class Game(object):
         }
         self.state.highscore = {
             "get_highscore": self.get_highscore, "set_highscore": self.set_highscore
+        }
+        self.state.intro = {
+            "get_done": self.get_intro_done, "set_done": self.set_intro_done
         }
 
     def toggle_show_fps(self, key):

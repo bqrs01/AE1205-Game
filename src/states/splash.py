@@ -53,6 +53,13 @@ class SplashScreen(tools.State):
         self.subtitle_rect = self.subtitle.get_rect(
             center=(self.screen_rect.center[0], self.screen_rect.center[1] + 30))
 
+        self.intro = {}
+
+    def startup(self, game_data):
+        # If intro not played before...
+        if not self.intro["get_done"]():
+            self.next_state = "TUTORIAL"
+
     def gen_images(self):
         self.images = []
         for idx in range(17):

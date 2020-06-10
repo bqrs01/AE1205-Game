@@ -105,7 +105,7 @@ class BossEnemy(tools._BaseSprite):
 
         self.bulletManager = bulletManager
 
-        self.mask = self.make_mask()
+        # self.mask = self.make_mask()
         self.direction = "right"
         self.direction_stack = []
 

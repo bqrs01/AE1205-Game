@@ -23,7 +23,7 @@
  
 
 >>> This project was created as a competition entry for the AE1205 Python course.
->>> It was programmed and designed by Mario Padron Tardaguila and Bryan Quadras
+>>> It was programmed and designed by Mario Padrón Tardáguila and Bryan Quadras
 """
 
 import sys

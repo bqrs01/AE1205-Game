@@ -38,9 +38,12 @@ MAX_SPEED = 5
 APPROACH_RADIUS = 100
 MAX_FORCE = 0.1
 
+DISTANCE_FROM_PLAYER = 250
+
 
 class EnemyAI():
     """ Gets the game more difficult as you kill more enemies"""
+
     def __init__(self, statsManager):
         self.statsManager = statsManager
         self.diff_val = [2, 3, 5, 7, 8, 9]
@@ -75,8 +78,6 @@ class EnemyManager(pg.sprite.Group):
                 player.captured()
             for enemy in collisions:
                 enemy.kill()
-
-
 
     def collided(self, spriteC):
         for sprite in self.sprites():
@@ -125,7 +126,7 @@ class Enemy(tools._BaseSprite):
 
         self.bulletManager = bulletManager
 
-        self.mask = self.make_mask()
+        # self.mask = self.make_mask()
         self.direction = "right"
         self.direction_stack = []
 
@@ -240,7 +241,7 @@ class Enemy(tools._BaseSprite):
             while True:
                 pos = vec(self.rect.x, self.rect.y)
                 dist = (self.target-pos)
-                if dist.magnitude() <= 500:
+                if dist.magnitude() <= DISTANCE_FROM_PLAYER:
                     newpos = self.random_pos()
                     self.rect.x, self.rect.y = newpos
                 else:

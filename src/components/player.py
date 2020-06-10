@@ -60,7 +60,7 @@ class Player(tools._BaseSprite):
         self.bulletManager = bulletManager
         self.explosionManager = explosionManager
 
-        self.mask = self.make_mask()
+        # self.mask = self.make_mask()
         self.direction = "right"
         self.direction_stack = []
         self.speed = SPEED

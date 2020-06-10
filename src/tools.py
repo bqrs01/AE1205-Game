@@ -270,8 +270,6 @@ class Game(object):
         except TypeError:
             self.setup_data(force=True)
 
-
-
     def set_highscore(self, newHighscore):
         self.highscore = newHighscore
         self.save_highscore()

@@ -35,7 +35,8 @@ pg.init()
 
 SCREEN_SIZE = (1200, 700)
 SCREEN_CENTER = (600, 350)
-ORIGINAL_CAPTION = "AE1205 Game"
+ORIGINAL_CAPTION = "Firecraze (by Mario and Bryan)"
+ORIGINAL_ICON_FILENAME = "redplain.png"
 
 STARTING_POS = (SCREEN_SIZE[0]//2, SCREEN_SIZE[1]//2)
 
@@ -53,7 +54,11 @@ DIRECT_DICT = {"down": (0, 1),
                "right": (1, 0)}
 
 pg.display.set_caption(ORIGINAL_CAPTION)
+
 _screen = pg.display.set_mode(SCREEN_SIZE)
+icon = pg.image.load(os.path.join(
+    os.getcwd(), f"src/images/{ORIGINAL_ICON_FILENAME}")).convert_alpha()
+pg.display.set_icon(icon)
 pg.display.update()
 
 

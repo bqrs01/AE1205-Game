@@ -32,6 +32,7 @@ from .states.menu import main_screen, settings, controls_screen
 
 
 def main():
+    # Initialise game screen
     screen = prepare.get_screen()
     caption = prepare.ORIGINAL_CAPTION
     states = {

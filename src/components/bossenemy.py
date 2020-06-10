@@ -163,12 +163,12 @@ class BossEnemy(tools._BaseSprite):
         image.blit(rotatedImage, origin)
         return image
 
-    def make_mask(self):
-        """Create a collision mask for the enemy."""
-        temp = pg.Surface(CELL_SIZE).convert_alpha()
-        temp.fill((0, 0, 0, 0))
-        temp.fill(pg.Color("white"), (10, 20, 30, 30))
-        return pg.mask.from_surface(temp)
+    # def make_mask(self):
+    #     """Create a collision mask for the enemy."""
+    #     temp = pg.Surface(CELL_SIZE).convert_alpha()
+    #     temp.fill((0, 0, 0, 0))
+    #     temp.fill(pg.Color("white"), (10, 20, 30, 30))
+    #     return pg.mask.from_surface(temp)
 
     def checkOutOfBounds(self):
         right = prepare.SCREEN_SIZE[0] - ((self.rect.width) / 2)

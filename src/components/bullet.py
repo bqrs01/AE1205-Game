@@ -36,7 +36,7 @@ BULLET_SIZE = (32, 32)
 CELL_SIZE = (46, 46)
 
 POWERUP_CHANCE = 0.08
-HEALTH_CHANCE = 0.50
+HEALTH_CHANCE = 1.0
 
 
 class BulletManager(pg.sprite.Group):

@@ -34,6 +34,8 @@ from ..components import player, enemy, bullet, explosion, powerup, bossenemy
 # Shortcut for vector
 vec = pg.math.Vector2
 
+BOSS_CHANCE = 0.50
+BOSS_INTERVAL = 1000
 
 class GamePlay(tools.State):
     def __init__(self):
@@ -235,10 +237,10 @@ class GamePlay(tools.State):
 
     def update(self, dt):
         """Update function to update sprite position and graphics."""
-        if self.statsManager.score >= 200 * self.bosscounter:
-            if random.random() > 0.05:
+        if self.statsManager.score >= BOSS_INTERVAL * self.bosscounter:
+            if random.random() <= BOSS_CHANCE:
                 self.bossenemyManager.generate(1)
-                self.bosscounter += 1
+            self.bosscounter += 1
         if not self.statsManager.gameOver:
             if self.isPaused:
                 # Do not update game if paused

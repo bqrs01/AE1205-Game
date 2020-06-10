@@ -50,6 +50,14 @@ class TutorialScreen(tools.State):
 
         self.intro = {}
 
+    def startup(self, game_data):
+        self.frame_num = 0
+        self.last_update = pg.time.get_ticks()
+        self.frame_rate = 70
+        self.loading = True
+        self.image_num = 0
+        self.next_state = "MAINSCREEN"
+
     def gen_images(self):
         for idx1 in range(len(self.imageFilenames)):
             images = []

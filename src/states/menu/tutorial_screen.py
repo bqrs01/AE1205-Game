@@ -59,6 +59,7 @@ class TutorialScreen(tools.State):
         self.loading = True
         self.image_num = 0
         self.next_state = "MAINSCREEN"
+        self.image = self.images[0]['frames'][0]
 
     def gen_images(self):
         for idx1 in range(len(self.imageFilenames)):
@@ -75,7 +76,8 @@ class TutorialScreen(tools.State):
             self.quit = True
         elif event.type == pg.KEYDOWN:
             if event.key == pg.K_SPACE:
-                self.done = True
+                if self.intro['get_done']():
+                    self.done = True
 
     def next_image(self):
         self.image_num += 1

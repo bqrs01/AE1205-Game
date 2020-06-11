@@ -111,7 +111,7 @@ class GamePlay(tools.State):
         self.start_message = self.paused_font_sub.render(
             "Game is about to start!", True, pg.Color('green'))
         self.start_message_rect = self.start_message.get_rect(
-            center=prepare.SCREEN_CENTER)
+            center=(prepare.SCREEN_CENTER[0], prepare.SCREEN_CENTER[1]-15))
         self.last_update = None
 
         # MISCALLANEOUS

@@ -5,6 +5,7 @@ Hello there. This game was designed and programmed by Mario and Bryan, for the T
 A trailer made for the game can be found below:
 
 [![FIRECRAZE_TRAILER](http://img.youtube.com/vi/Ptjd2I8t7O0/0.jpg)](http://www.youtube.com/watch?v=Ptjd2I8t7O0 "Firecraze (Trailer)")
+http://www.youtube.com/watch?v=Ptjd2I8t7O0
 
 ## Prerequisites
 You must have `Python 3.8.2` installed with `pygame 2.0.0.dev10`. The game has been tested to work correctly under Windows 10 and macOS Catalina.

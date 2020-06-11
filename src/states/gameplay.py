@@ -405,7 +405,6 @@ class StatsManager():
     def addScore(self, points):
         """Add score to tally."""
         self.score += int(points * self.multiplier)
-        # print(f"Score: {self.score}")
 
     def addHealth(self, health=10):
         health = min(self.health + health, 50)

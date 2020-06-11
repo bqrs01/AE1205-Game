@@ -46,10 +46,10 @@ class PowerupManager(pg.sprite.Group):
         self.statsManager = statsManager
 
     def new_powerup(self, center_pos, soundManager, health=False):
-        if (len(self) == 0) and (not self.statsManager.powerup_active) and (self.statsManager.cooldown <= 0):
-            self.add(Powerup(center_pos, soundManager))
-        elif health:
+        if health:
             self.add(Powerup(center_pos, soundManager, health=True))
+        elif (len(self) == 0) and (not self.statsManager.powerup_active) and (self.statsManager.cooldown <= 0):
+            self.add(Powerup(center_pos, soundManager))
 
     def update(self, *args):
         for powerup in self.sprites():

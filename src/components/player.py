@@ -152,9 +152,9 @@ class Player(tools._BaseSprite):
         self.target_position = position
 
     def got_shot(self):
+        """When player gets shot..."""
         if not self.safe_zone:
             self.statsManager.dropHealth(5)
-            print("got shot. safe zone.")
             self.statsManager.reset_powerups()
             self.safe_zone = True
             self.bullet_cooldown = BULLET_COOLDOWN_SAFEZONE
@@ -163,9 +163,9 @@ class Player(tools._BaseSprite):
             self.sz_time = SAFEZONE_TIME
 
     def captured(self):
+        """When player gets captured..."""
         if not self.safe_zone:
             self.statsManager.dropHealth(10)
-            print("captured. safe zone.")
             self.statsManager.reset_powerups()
             self.safe_zone = True
             self.bullet_cooldown = BULLET_COOLDOWN_SAFEZONE
@@ -203,6 +203,7 @@ class Player(tools._BaseSprite):
             else:
                 self.direction = self.direction_stack[-1]
                 vector = prepare.DIRECT_DICT[self.direction]
+
             self.exact_pos[0] += self.speed*vector[0]
             self.exact_pos[1] += self.speed*vector[1]
 
@@ -220,10 +221,7 @@ class Player(tools._BaseSprite):
             if self.sz_time < 0:
                 self.safe_zone = False
                 self.sz_timer = False
-                print('safe zone off')
-
-        # else:
-        #     self.bullet_cooldown = 50
+                # Safe zone off
 
         if self.bullet_cooldown > 0:
             self.bullet_cooldown -= dt
@@ -236,7 +234,9 @@ class Player(tools._BaseSprite):
             self.isMoving = True
         else:
             self.isMoving = False
+
         self.old_pos = self.exact_pos[:]
+
         if self.canPlayerMove:
             self.move()
             self.checkOutOfBounds()

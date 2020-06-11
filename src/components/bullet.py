@@ -146,7 +146,6 @@ class Bullet(tools._BaseSprite):
         tools._BaseSprite.__init__(
             self, (x, y), CELL_SIZE, *groups)
 
-        # self.mask = self.make_mask()
         self.direction = "right"
         self.direction_stack = []
         self.speed = 15

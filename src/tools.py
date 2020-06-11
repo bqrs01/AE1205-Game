@@ -43,7 +43,7 @@ song_names = [
     "l o o s e g o o s e - S P R I N G F I E L D ' 9 6",
     "Color Index - Intervals (Open Spectrum)",
     "Nowtro - Still Human (Teaser)",
-    "Syntax - Syntax - Stratus (f. HOME)",
+    "Syntax - Stratus (f. HOME)",
     "oDDling - Ascend"
 ]
 
@@ -349,6 +349,7 @@ class Game(object):
         self.state.startup(game_data)
 
     def set_state(self):
+        "Set state variables."
         self.state.bgmusic = {
             "song_name": song_names[self.music_index], "pause_music": self.pause_music,
             "get_volume": self.get_music_volume, "set_volume": self.set_music_volume,
@@ -383,7 +384,6 @@ class Game(object):
             self.state.bgmusic["current_position"] = (0, 0)
             self.state.bgmusic["song_length"] = self.get_min_and_secs(
                 self.music_end-self.music_start)
-            # print(song_names[self.music_index])
             pg.mixer.music.play(start=self.music_start)
         if self.state.quit:
             self.done = True
